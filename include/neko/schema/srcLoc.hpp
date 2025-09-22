@@ -1,5 +1,13 @@
 #pragma once
 
+#if __cplusplus < 202002L
+    #error "Neko SrcLoc requires C++20 or later"
+#endif
+
+#if __cpp_lib_source_location < 201907L
+    #error "Neko SrcLoc requires <source_location> support"
+#endif
+
 #include <neko/schema/types.hpp>
 
 #include <source_location>
