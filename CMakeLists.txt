@@ -9,6 +9,6 @@ target_include_directories(NekoSchema INTERFACE
 )
 
 # Dependencies
-target_link_libraries(NekoSchema INTERFACE SimpleIni nlohmann_json)
+target_link_libraries(NekoSchema INTERFACE)
 
 target_compile_features(NekoSchema INTERFACE cxx_std_20)
