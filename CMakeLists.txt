@@ -8,7 +8,4 @@ target_include_directories(NekoSchema INTERFACE
     $<INSTALL_INTERFACE:include>
 )
 
-# Dependencies
-target_link_libraries(NekoSchema INTERFACE)
-
 target_compile_features(NekoSchema INTERFACE cxx_std_20)

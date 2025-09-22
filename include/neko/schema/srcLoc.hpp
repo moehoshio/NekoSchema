@@ -1,5 +1,9 @@
 #pragma once
 
+/* ===================== */
+/* == Compiler Checks == */
+/* ===================== */
+
 #if __cplusplus < 202002L
     #error "Neko SrcLoc requires C++20 or later"
 #endif
@@ -8,9 +12,14 @@
     #error "Neko SrcLoc requires <source_location> support"
 #endif
 
-#include <neko/schema/types.hpp>
+
+/* ===================== */
+/* === Include Files === */
+/* ===================== */
 
 #include <source_location>
+
+#include <neko/schema/types.hpp>
 
 namespace neko {
 
