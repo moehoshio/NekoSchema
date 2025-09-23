@@ -6,7 +6,7 @@ A lightweight C++20 header-only library providing fundamental type definitions a
 
 NekoSchema serves as a foundational module that defines common types, enumerations, and exception handling utilities. It provides consistent type aliases and basic infrastructure components that can be shared across multiple projects.
 
-[![License](https://img.shields.io/badge/License-MIT%20OR%20Apache--2.0-blue.svg)](./LICENSE)
+[![License](https://img.shields.io/badge/License-MIT%20OR%20Apache--2.0-blue.svg)](LICENSE)
 ![Require](https://img.shields.io/badge/%20Require%20-%3E=%20C++%2020-orange.svg)
 
 ## Features
