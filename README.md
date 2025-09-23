@@ -20,6 +20,7 @@ NekoSchema serves as a foundational module that defines common types, enumeratio
 ## Requirements
 
 - C++20 or higher compatible compiler
+- CMake 3.14 or higher (if using CMake)
 
 ## Integration
 
@@ -41,23 +42,9 @@ FetchContent_MakeAvailable(NekoSchema)
 target_link_libraries(your_target PRIVATE NekoSchema)
 ```
 
-### Git Submodule
-
-Add NekoSchema as a git submodule:
-
-```bash
-git submodule add https://github.com/moehoshio/NekoSchema.git
-```
-
-Update submodules:
-
-```bash
-git submodule update --init --recursive
-```
-
 ### Manually
 
-Clone or download the repository and include the `include/` directory in your project's include path.
+1. Clone or download the repository to your local machine:
 
 ```shell
 git clone https://github.com/moehoshio/NekoSchema.git
@@ -69,6 +56,12 @@ or
 curl -L -o NekoSchema.zip https://github.com/moehoshio/NekoSchema/archive/refs/heads/main.zip
 
 unzip NekoSchema.zip
+```
+
+2. Copy the `include` folder to your include directory
+
+```shell
+cp -r NekoSchema/include/ /path/to/your/include/
 ```
 
 ## Type Definitions
