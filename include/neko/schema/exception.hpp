@@ -5,7 +5,7 @@
 #pragma once
 
 #include <neko/schema/types.hpp>
-#include <neko/schema/srcloc.hpp>
+#include <neko/schema/srcLoc.hpp>
 
 #include <exception>
 #include <string>
