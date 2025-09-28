@@ -8,7 +8,7 @@
     #error "Neko SrcLoc requires C++20 or later"
 #endif
 
-#if __cpp_lib_source_location < 201907L
+#if !__has_include(<source_location>)
     #error "Neko SrcLoc requires <source_location> support"
 #endif
 
