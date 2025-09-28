@@ -29,9 +29,9 @@ namespace neko {
         constexpr auto end() const { return data.end(); }
     };
 
-    template <typename Key, typename Value, neko::uint64 N>
+    template <typename Key, typename Value, std::size_t N>
     ConstexprMap(std::array<std::pair<Key, Value>, N>) 
-        -> ConstexprMap<Key, Value, N>;
+        -> ConstexprMap<Key, Value, static_cast<neko::uint64>(N)>;
 
     
 } // namespace neko
