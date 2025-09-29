@@ -8,6 +8,7 @@ NekoSchema serves as a foundational module that defines common types, enumeratio
 
 [![License](https://img.shields.io/badge/License-MIT%20OR%20Apache--2.0-blue.svg)](LICENSE)
 ![Require](https://img.shields.io/badge/%20Require%20-%3E=%20C++%2020-orange.svg)
+[![CMake](https://img.shields.io/badge/CMake-3.14+-green.svg)](https://cmake.org/)
 
 ## Features
 
@@ -120,6 +121,21 @@ int main() {
 }
 ```
 
+## Constexpr Map
+
+```cpp
+#include <neko/schema/map.hpp>
+
+int main(){
+constexpr neko::Map<neko::strview, neko::uint32> map{
+    {"one", 1},
+    {"two", 2},
+    {"three", 3}
+};
+static_assert(map.at("two") == 2);
+}
+```
+
 ## Exception
 
 ```cpp
@@ -146,20 +162,15 @@ try {
 }
 ```
 
-## Project Structure
-
-```text
-NekoSchema/
-├── include/
-│   └── neko/
-│       └── schema/
-│           ├── types.hpp      # Type definitions and enums
-│           ├── exception.hpp  # Exception classes
-│           └── srcLoc.hpp     # Source location
-├── CMakeLists.txt
-└── README.md
-```
-
 ## License
 
 [LICENSE](LICENSE) MIT OR Apache-2.0
+
+## See More
+
+- [NekoLog](https://github.com/moehoshio/nlog): An easy-to-use, modern, lightweight, and efficient C++20 logging library.
+- [NekoEvent](https://github.com/moehoshio/NekoEvent): A modern easy to use type-safe and high-performance event handling system for C++.
+- [NekoSchema](https://github.com/moehoshio/NekoSchema): A lightweight, header-only C++20 schema library.
+- [NekoSystem](https://github.com/moehoshio/NekoSystem): A modern C++20 cross-platform system utility library.
+- [NekoFunction](https://github.com/moehoshio/NekoFunction): A comprehensive modern C++ utility library that provides practical functions for common programming tasks.
+- [NekoThreadPool](https://github.com/moehoshio/NekoThreadPool): An easy to use and efficient C++ 20 thread pool that supports priorities and submission to specific threads.
