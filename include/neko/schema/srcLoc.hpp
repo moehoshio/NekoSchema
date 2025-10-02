@@ -9,15 +9,14 @@
 #endif
 
 #if !__has_include(<source_location>)
-    #error "Neko SrcLoc requires <source_location> support"
+    #error "Neko SrcLoc Cannot find header <source_location>."
 #endif
 
-
-/* ===================== */
-/* === Include Files === */
-/* ===================== */
-
 #include <source_location>
+
+#if !defined(__cpp_lib_source_location) || __cpp_lib_source_location < 201907L
+    #error "Neko SrcLoc requires <source_location> support."
+#endif
 
 #include <neko/schema/types.hpp>
 

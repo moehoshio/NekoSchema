@@ -40,6 +40,9 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(NekoSchema)
 
+# Define your target and link NekoSchema
+add_executable(your_target main.cpp)
+
 target_link_libraries(your_target PRIVATE NekoSchema)
 ```
 
@@ -161,6 +164,65 @@ try {
     // ...
 }
 ```
+
+## Testing
+
+You can run the tests to verify that everything is working correctly.
+
+If you haven't configured the build yet, please run:
+
+```shell
+cmake -B ./build . -DNEKO_BUILD_TESTS=ON
+```
+
+Now, you can build the test files (you must build them manually at least once before running the tests!).
+
+```shell
+cmake --build ./build --config Debug
+```
+
+Then, you can run the tests with the following commands:
+
+Unix Makefile / Ninja generator：
+
+```shell
+cmake --build ./build --target test
+```
+
+Visual Studio generator：
+
+```shell
+cmake --build ./build --config Debug --target RUN_TESTS
+```
+
+If everything is set up correctly, you should see output similar to the following:
+
+```shell
+  Test project /path/to/NekoSchema/build
+        Start  1: TypesTest.BasicTypesSize
+   1/28 Test  #1: TypesTest.BasicTypesSize ........................
+    .....   Passed    0.02 sec
+
+    .....
+
+        Start 28: PerformanceTest.ConstexprMapLookupSpeed
+  28/28 Test #28: PerformanceTest.ConstexprMapLookupSpeed .........
+  .....   Passed    0.02 sec
+
+  100% tests passed, 0 tests failed out of 28
+
+  Total Test time (real) =   0.58 sec
+```
+
+### Disable Tests
+
+If you want to disable building and running tests, you can set the following CMake option when configuring your project:
+
+```shell
+cmake -B ./build . -DNEKO_BUILD_TESTS=OFF
+```
+
+This will skip test targets during the build process.
 
 ## License
 
