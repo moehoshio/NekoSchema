@@ -1,7 +1,31 @@
 cmake_minimum_required(VERSION 3.14)
 project(NekoSchema VERSION 1.0 LANGUAGES CXX)
 
+option(NEKO_AUTO_FETCH_DEPS "Automatically fetch dependencies" ON)
 option(NEKO_BUILD_TESTS "Build tests" ON)
+
+if(NEKO_AUTO_FETCH_DEPS)
+
+    if(NEKO_BUILD_TESTS)
+        find_package(GTest QUIET)
+
+        if(NOT GTest_FOUND)
+            # If GTest is not found, fetch it
+            include(FetchContent)
+            FetchContent_Declare(
+                googletest
+                GIT_REPOSITORY https://github.com/google/googletest.git
+                GIT_TAG        release-1.12.1
+            )
+            # For Windows: Prevent overriding the parent project's compiler/linker settings
+            set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+            FetchContent_MakeAvailable(googletest)
+        endif(NOT GTest_FOUND)
+
+    endif(NEKO_BUILD_TESTS)
+
+endif(NEKO_AUTO_FETCH_DEPS)
+
 
 # Library definition
 add_library(NekoSchema INTERFACE)
@@ -35,21 +59,11 @@ endif()
 
 # Testing support
 if(NEKO_BUILD_TESTS)
-    enable_testing()
-    find_package(GTest QUIET)
-    
-    if(NOT GTest_FOUND)
-        # If GTest is not found, fetch it
-        include(FetchContent)
-        FetchContent_Declare(
-            googletest
-            GIT_REPOSITORY https://github.com/google/googletest.git
-            GIT_TAG        release-1.12.1
-        )
-        # For Windows: Prevent overriding the parent project's compiler/linker settings
-        set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-        FetchContent_MakeAvailable(googletest)
+    if(NOT NEKO_AUTO_FETCH_DEPS AND NOT GTest_FOUND)
+        message(FATAL_ERROR "GTest is required for building tests. Please enable NEKO_AUTO_FETCH_DEPS or install GTest manually.")
     endif()
+
+    enable_testing()
 
     # Add test executable
     add_executable(schema_tests tests/schema_test.cpp)
