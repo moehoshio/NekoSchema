@@ -22,6 +22,7 @@ NekoSchema serves as a foundational module that defines common types, enumeratio
 
 - C++20 or higher compatible compiler
 - CMake 3.14 or higher (if using CMake)
+- Git
 
 ## Integration
 
@@ -172,7 +173,10 @@ You can run the tests to verify that everything is working correctly.
 If you haven't configured the build yet, please run:
 
 ```shell
-cmake -B ./build . -DNEKO_BUILD_TESTS=ON
+# Global options
+cmake -B ./build -D NEKO_AUTO_FETCH_DEPS=ON -D NEKO_BUILD_TESTS=ON -S .
+# Or project specific options
+cmake -B ./build -D NEKO_SCHEMA_AUTO_FETCH_DEPS=ON -D NEKO_SCHEMA_BUILD_TESTS=ON -S .
 ```
 
 Now, you can build the test files (you must build them manually at least once before running the tests!).
@@ -183,16 +187,8 @@ cmake --build ./build --config Debug
 
 Then, you can run the tests with the following commands:
 
-Unix Makefile / Ninja generator：
-
 ```shell
-cmake --build ./build --target test
-```
-
-Visual Studio generator：
-
-```shell
-cmake --build ./build --config Debug --target RUN_TESTS
+cd ./build && ctest --output-on-failure
 ```
 
 If everything is set up correctly, you should see output similar to the following:
@@ -219,8 +215,16 @@ If everything is set up correctly, you should see output similar to the followin
 If you want to disable building and running tests, you can set the following CMake option when configuring your project:
 
 ```shell
-cmake -B ./build . -DNEKO_BUILD_TESTS=OFF
+cmake -B ./build -DNEKO_SCHEMA_BUILD_TESTS=OFF -S .
 ```
+
+or
+
+```shell
+cmake -B ./build -DNEKO_BUILD_TESTS=OFF -S .
+```
+
+(Note: This will disable tests for all Neko modules!)
 
 This will skip test targets during the build process.
 
@@ -230,6 +234,7 @@ This will skip test targets during the build process.
 
 ## See More
 
+- [NekoNet](https://github.com/moehoshio/NekoNet): A modern , easy-to-use C++20 networking library via libcurl.
 - [NekoLog](https://github.com/moehoshio/NekoLog): An easy-to-use, modern, lightweight, and efficient C++20 logging library.
 - [NekoEvent](https://github.com/moehoshio/NekoEvent): A modern easy to use type-safe and high-performance event handling system for C++.
 - [NekoSchema](https://github.com/moehoshio/NekoSchema): A lightweight, header-only C++20 schema library.
