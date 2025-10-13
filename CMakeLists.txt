@@ -5,11 +5,6 @@ project(NekoSchema VERSION 1.0 LANGUAGES CXX)
 # === Config ====
 # ================
 
-# Neko Module common options
-option(NEKO_BUILD_TESTS "Neko Build tests" ON)
-option(NEKO_AUTO_FETCH_DEPS "Neko Automatically fetch dependencies" ON)
-
-
 # Neko schema project specific options
 option(NEKO_SCHEMA_BUILD_TESTS "Neko Schema Build tests" ON)
 option(NEKO_SCHEMA_AUTO_FETCH_DEPS "Neko Schema Automatically fetch dependencies" ON)
@@ -28,7 +23,7 @@ message(STATUS "  - No dependencies")
 message(STATUS "")
 
 
-if(NEKO_SCHEMA_AUTO_FETCH_DEPS OR (NEKO_AUTO_FETCH_DEPS AND NEKO_SCHEMA_AUTO_FETCH_DEPS))
+if(NEKO_SCHEMA_AUTO_FETCH_DEPS)
     include(FetchContent)
 
     if(NEKO_SCHEMA_BUILD_TESTS)
@@ -90,7 +85,7 @@ if(NEKO_SCHEMA_BUILD_TESTS)
     enable_testing()
     message(STATUS "NekoSchema tests enabled")
 
-    if (NOT NEKO_SCHEMA_AUTO_FETCH_DEPS AND NOT NEKO_AUTO_FETCH_DEPS)
+    if (NOT NEKO_SCHEMA_AUTO_FETCH_DEPS)
         message(FATAL_ERROR "GTest is required for building tests. Please enable NEKO_SCHEMA_AUTO_FETCH_DEPS")
     endif()
 
