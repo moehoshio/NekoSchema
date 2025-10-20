@@ -9,9 +9,11 @@ project(NekoSchema VERSION 1.0 LANGUAGES CXX)
 option(NEKO_SCHEMA_BUILD_TESTS "Neko Schema Build tests" ON)
 option(NEKO_SCHEMA_AUTO_FETCH_DEPS "Neko Schema Automatically fetch dependencies" ON)
 
+find_package(GTest CONFIG QUIET)
 
 # Print configuration summary
 message(STATUS "Start configuration Neko Schema...")
+message(STATUS "")
 message(STATUS "Neko Schema configuration summary:")
 message(STATUS "  - CMake version: ${CMAKE_VERSION}")
 message(STATUS "")
@@ -19,15 +21,15 @@ message(STATUS "  - Neko Auto fetch deps: ${NEKO_SCHEMA_AUTO_FETCH_DEPS} common:
 message(STATUS "  - Neko Build tests: ${NEKO_SCHEMA_BUILD_TESTS} common: ${NEKO_BUILD_TESTS}")
 message(STATUS "")
 message(STATUS "Dependency summary:")
-message(STATUS "  - No dependencies")
+message(STATUS "  - GTest : ${GTest_FOUND} version : ${GTest_VERSION}")
 message(STATUS "")
 
 
 if(NEKO_SCHEMA_AUTO_FETCH_DEPS)
     include(FetchContent)
 
-    if(NEKO_SCHEMA_BUILD_TESTS)
-        message(STATUS "Neko Schema Fetching GoogleTest...")
+    if(NOT GTEST_FOUND AND NEKO_SCHEMA_BUILD_TESTS)
+        message(STATUS "GTest not found; Neko Schema Fetching GoogleTest...")
 
         FetchContent_Declare(
             googletest
@@ -83,11 +85,13 @@ endif()
 
 if(NEKO_SCHEMA_BUILD_TESTS)
     enable_testing()
-    message(STATUS "NekoSchema tests enabled")
+    message(STATUS "NekoSchema tests enabled (NEKO_BUILD_TESTS=ON)")
 
-    if (NOT NEKO_SCHEMA_AUTO_FETCH_DEPS)
-        message(FATAL_ERROR "GTest is required for building tests. Please enable NEKO_SCHEMA_AUTO_FETCH_DEPS")
+    if (NOT GTEST_FOUND AND NOT NEKO_SCHEMA_AUTO_FETCH_DEPS)
+        message(STATUS "GTest is required for building tests but was not found.")
+        message(FATAL_ERROR "Please enable -DNEKO_SCHEMA_AUTO_FETCH_DEPS=ON or install GTest and make it discoverable by CMake. e.g -DCMAKE_PREFIX_PATH=</path/to/googletest>")
     endif()
+    
 
     add_executable(NekoSchema_tests tests/schema_test.cpp)    
     target_link_libraries(NekoSchema_tests PRIVATE NekoSchema GTest::gtest_main)
@@ -97,7 +101,7 @@ if(NEKO_SCHEMA_BUILD_TESTS)
     gtest_discover_tests(NekoSchema_tests)
     
 else()
-    message(STATUS "NekoSchema tests disabled (NEKO_BUILD_TESTS=OFF)")
+    message(STATUS "NekoSchema tests disabled (NEKO_SCHEMA_BUILD_TESTS=OFF)")
 endif()
 
-message(STATUS "End Neko Schema")
+message(STATUS "Neko Schema End of configuration")
