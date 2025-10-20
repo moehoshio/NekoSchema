@@ -41,6 +41,7 @@ namespace neko {
             Completed,     // Operation finished successfully, no further action needed
             ActionNeeded,  // Action required from user or system
             RetryRequired, // Temporary failure, should retry later
+            Failed         // Permanent failure, cannot proceed
         };
 
         enum class Priority : uint8 {
@@ -49,6 +50,21 @@ namespace neko {
             High = 2,
             Critical = 3
         };
+
+        inline neko::cstr toString(State state) {
+            switch (state) {
+                case State::Completed:
+                    return "Completed";
+                case State::ActionNeeded:
+                    return "ActionNeeded";
+                case State::RetryRequired:
+                    return "RetryRequired";
+                case State::Failed:
+                    return "Failed";
+                default:
+                    return "Unknown";
+            }
+        }
 
         inline neko::cstr toString(Priority priority) {
             switch (priority) {
