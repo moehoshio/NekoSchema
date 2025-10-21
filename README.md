@@ -17,6 +17,7 @@ NekoSchema serves as a foundational module that defines common types, enumeratio
 - **Exception Handling**: Comprehensive exception classes with source location tracking
 - **Source Location**: Utilities for capturing and handling source code location information
 - **Header-Only**: No compilation required, just include and use
+- **C++20 Module Support**: Optional module interface for modern C++20 projects
 
 ## Requirements
 
@@ -68,6 +69,78 @@ unzip NekoSchema.zip
 ```shell
 cp -r NekoSchema/include/ /path/to/your/include/
 ```
+
+## C++20 Module Support
+
+NekoSchema now supports C++20 modules as an alternative to traditional header includes. The module wraps all header files using the `export { #include "..." }` pattern, allowing you to use either approach.
+
+### Building with Module Support
+
+To enable C++20 module support, use the `NEKO_SCHEMA_BUILD_MODULE` option:
+
+```cmake
+include(FetchContent)
+
+FetchContent_Declare(
+    NekoSchema
+    GIT_REPOSITORY https://github.com/moehoshio/NekoSchema.git
+    GIT_TAG        main
+)
+
+# Enable module support
+set(NEKO_SCHEMA_BUILD_MODULE ON CACHE BOOL "" FORCE)
+
+FetchContent_MakeAvailable(NekoSchema)
+
+# Link against the module target
+add_executable(your_target main.cpp)
+target_link_libraries(your_target PRIVATE Neko::Schema::Module)
+```
+
+### Using the Module
+
+Instead of including headers, simply import the module:
+
+```cpp
+import neko.schema;
+
+int main() {
+    neko::uint32 value = 42;
+    neko::Priority priority = neko::Priority::High;
+    
+    try {
+        throw neko::ex::Exception("Module example");
+    } catch (const neko::ex::Exception& e) {
+        std::cout << e.what() << std::endl;
+    }
+    
+    return 0;
+}
+```
+
+### Compiler Requirements for Modules
+
+- **MSVC**: Visual Studio 2019 16.10+ or Visual Studio 2022
+- **GCC**: Version 11.0+
+- **Clang**: Version 16.0+
+- **CMake**: Version 3.28+ (recommended for full module support)
+
+### Module vs Headers
+
+You can choose between:
+
+1. **Traditional Headers** (default): `#include <neko/schema/types.hpp>`
+   - Widely compatible
+   - No special build configuration needed
+   - Works with all C++20 compilers
+
+2. **C++20 Module**: `import neko.schema;`
+   - Faster compilation
+   - Better isolation
+   - Requires compiler and build system support
+   - Enabled with `-DNEKO_SCHEMA_BUILD_MODULE=ON`
+
+The original headers remain the primary interface, and the module is provided as an optional modern alternative.
 
 ## Type Definitions
 
