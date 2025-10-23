@@ -141,7 +141,7 @@ endif()
 
 if(NEKO_SCHEMA_BUILD_TESTS)
     enable_testing()
-    message(STATUS "NekoSchema tests enabled (NEKO_BUILD_TESTS=ON)")
+    message(STATUS "NekoSchema tests enabled (NEKO_SCHEMA_BUILD_TESTS=ON)")
 
     if (NOT GTEST_FOUND AND NOT NEKO_SCHEMA_AUTO_FETCH_DEPS)
         message(WARNING "GTest is required for building tests but was not found.")
