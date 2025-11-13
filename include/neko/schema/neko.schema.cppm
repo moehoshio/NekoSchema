@@ -25,5 +25,5 @@ export {
     #include "types.hpp"
     #include "srcLoc.hpp"
     #include "exception.hpp"
-    #include "map.hpp"
+    #include "constexprMap.hpp"
 }

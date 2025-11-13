@@ -4,10 +4,6 @@
 /* == Compiler Checks == */
 /* ===================== */
 
-#if __cplusplus < 202002L
-    #error "Neko SrcLoc requires C++20 or later"
-#endif
-
 #if !__has_include(<source_location>)
     #error "Neko SrcLoc Cannot find header <source_location>."
 #endif

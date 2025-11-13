@@ -27,7 +27,101 @@ NekoSchema serves as a foundational module that defines common types, enumeratio
 
 ## Integration
 
-### CMake
+### Conan
+
+Add NekoSchema to your `conanfile.txt`:
+
+```ini
+[requires]
+nekoshema/1.0
+
+[generators]
+CMakeDeps
+CMakeToolchain
+```
+
+Or use it in your `conanfile.py`:
+
+```python
+from conan import ConanFile
+
+class YourProject(ConanFile):
+    requires = "neko-schema/1.0"
+    generators = "CMakeDeps", "CMakeToolchain"
+```
+
+Then install and use:
+
+```shell
+conan install . --build=missing
+cmake -B build -DCMAKE_TOOLCHAIN_FILE=build/conan_toolchain.cmake
+cmake --build build
+```
+
+In your CMakeLists.txt:
+
+```cmake
+find_package(NekoSchema REQUIRED)
+target_link_libraries(your_target PRIVATE Neko::Schema)
+```
+
+### vcpkg
+
+Install NekoSchema using vcpkg:
+
+```shell
+vcpkg install neko-schema
+```
+
+Or add it to your `vcpkg.json`:
+
+```json
+{
+  "dependencies": ["neko-schema"]
+}
+```
+
+**Optional Features:**
+
+Install with tests (includes GTest):
+
+```shell
+vcpkg install neko-schema[tests]
+```
+
+Install with C++20 module support:
+
+```shell
+vcpkg install neko-schema[module]
+```
+
+Install with all features:
+
+```shell
+vcpkg install neko-schema[tests,module]
+```
+
+In your `vcpkg.json` with features:
+
+```json
+{
+  "dependencies": [
+    {
+      "name": "neko-schema",
+      "features": ["tests", "module"]
+    }
+  ]
+}
+```
+
+Then in your CMakeLists.txt:
+
+```cmake
+find_package(NekoSchema CONFIG REQUIRED)
+target_link_libraries(your_target PRIVATE Neko::Schema)
+```
+
+### CMake FetchContent
 
 Add NekoSchema to your CMake project using `FetchContent`:
 
@@ -201,7 +295,7 @@ int main() {
 ## Constexpr Map
 
 ```cpp
-#include <neko/schema/map.hpp>
+#include <neko/schema/constexprMap.hpp>
 
 int main(){
 constexpr neko::Map<neko::strview, neko::uint32> map{
@@ -246,9 +340,6 @@ You can run the tests to verify that everything is working correctly.
 If you haven't configured the build yet, please run:
 
 ```shell
-# Global options
-cmake -B ./build -D NEKO_AUTO_FETCH_DEPS=ON -D NEKO_BUILD_TESTS=ON -S .
-# Or project specific options
 cmake -B ./build -D NEKO_SCHEMA_AUTO_FETCH_DEPS=ON -D NEKO_SCHEMA_BUILD_TESTS=ON -S .
 ```
 
@@ -290,14 +381,6 @@ If you want to disable building and running tests, you can set the following CMa
 ```shell
 cmake -B ./build -DNEKO_SCHEMA_BUILD_TESTS=OFF -S .
 ```
-
-or
-
-```shell
-cmake -B ./build -DNEKO_BUILD_TESTS=OFF -S .
-```
-
-(Note: This will disable tests for all Neko modules!)
 
 This will skip test targets during the build process.
 

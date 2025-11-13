@@ -2,7 +2,7 @@
 #include <neko/schema/types.hpp>
 #include <neko/schema/exception.hpp>
 #include <neko/schema/srcLoc.hpp>
-#include <neko/schema/map.hpp>
+#include <neko/schema/constexprMap.hpp>
 
 #include <string>
 #include <sstream>
