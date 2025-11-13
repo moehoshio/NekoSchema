@@ -27,6 +27,27 @@ NekoSchema serves as a foundational module that defines common types, enumeratio
 
 ## Integration
 
+### CMake FetchContent
+
+Add NekoSchema to your CMake project using `FetchContent`:
+
+```cmake
+include(FetchContent)
+
+# Add NekoSchema to your CMake project
+FetchContent_Declare(
+    NekoSchema
+    GIT_REPOSITORY https://github.com/moehoshio/NekoSchema.git
+    GIT_TAG        main
+)
+FetchContent_MakeAvailable(NekoSchema)
+
+# Define your target and link NekoSchema
+add_executable(your_target main.cpp)
+
+target_link_libraries(your_target PRIVATE NekoSchema)
+```
+
 ### Conan
 
 Add NekoSchema to your `conanfile.txt`:
@@ -121,27 +142,6 @@ find_package(NekoSchema CONFIG REQUIRED)
 target_link_libraries(your_target PRIVATE Neko::Schema)
 ```
 
-### CMake FetchContent
-
-Add NekoSchema to your CMake project using `FetchContent`:
-
-```cmake
-include(FetchContent)
-
-# Add NekoSchema to your CMake project
-FetchContent_Declare(
-    NekoSchema
-    GIT_REPOSITORY https://github.com/moehoshio/NekoSchema.git
-    GIT_TAG        main
-)
-FetchContent_MakeAvailable(NekoSchema)
-
-# Define your target and link NekoSchema
-add_executable(your_target main.cpp)
-
-target_link_libraries(your_target PRIVATE NekoSchema)
-```
-
 ### Manually
 
 1. Clone or download the repository to your local machine:
@@ -166,11 +166,11 @@ cp -r NekoSchema/include/ /path/to/your/include/
 
 ## C++20 Module Support
 
-NekoSchema now supports C++20 modules as an alternative to traditional header includes. The module wraps all header files using the `export { #include "..." }` pattern, allowing you to use either approach.
+NekoSchema supports C++20 modules
 
 ### Building with Module Support
 
-To enable C++20 module support, use the `NEKO_SCHEMA_BUILD_MODULE` option:
+To enable C++20 module support, use the `NEKO_SCHEMA_ENABLE_MODULE` option:
 
 ```cmake
 include(FetchContent)
@@ -182,7 +182,7 @@ FetchContent_Declare(
 )
 
 # Enable module support
-set(NEKO_SCHEMA_BUILD_MODULE ON CACHE BOOL "" FORCE)
+set(NEKO_SCHEMA_ENABLE_MODULE ON CACHE BOOL "" FORCE)
 
 FetchContent_MakeAvailable(NekoSchema)
 
@@ -218,23 +218,6 @@ int main() {
 - **GCC**: Version 11.0+
 - **Clang**: Version 16.0+
 - **CMake**: Version 3.28+ (recommended for full module support)
-
-### Module vs Headers
-
-You can choose between:
-
-1. **Traditional Headers** (default): `#include <neko/schema/types.hpp>`
-   - Widely compatible
-   - No special build configuration needed
-   - Works with all C++20 compilers
-
-2. **C++20 Module**: `import neko.schema;`
-   - Faster compilation
-   - Better isolation
-   - Requires compiler and build system support
-   - Enabled with `-DNEKO_SCHEMA_BUILD_MODULE=ON`
-
-The original headers remain the primary interface, and the module is provided as an optional modern alternative.
 
 ## Type Definitions
 
