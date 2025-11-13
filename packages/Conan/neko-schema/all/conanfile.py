@@ -6,7 +6,7 @@ import os
 
 class NekoSchemaConan(ConanFile):
     name = "neko-schema"
-    version = "1.0.0"
+    version = "1.0.2"
     license = "MIT OR Apache-2.0"
     author = "moehoshio"
     url = "https://github.com/moehoshio/NekoSchema"
@@ -15,14 +15,10 @@ class NekoSchemaConan(ConanFile):
     
     settings = "os", "compiler", "build_type", "arch"
     options = {
-        "build_tests": [True, False],
-        "build_module": [True, False],
-        "with_gtest": [True, False],
+        "enable_module": [True, False],
     }
     default_options = {
-        "build_tests": False,
-        "build_module": False,
-        "with_gtest": False,
+        "enable_module": False,
     }
     
     # Header-only library
@@ -31,19 +27,13 @@ class NekoSchemaConan(ConanFile):
     
     exports_sources = "CMakeLists.txt", "include/*", "tests/*", "LICENSE", "README.md"
     
-    def requirements(self):
-        if self.options.with_gtest:
-            self.test_requires("gtest/1.14.0")
-        elif self.options.build_tests:
-            self.test_requires("gtest/1.14.0")
-    
     def layout(self):
         cmake_layout(self)
     
     def generate(self):
         tc = CMakeToolchain(self)
-        tc.variables["NEKO_SCHEMA_BUILD_TESTS"] = self.options.build_tests
-        tc.variables["NEKO_SCHEMA_BUILD_MODULE"] = self.options.build_module
+        tc.variables["NEKO_SCHEMA_BUILD_TESTS"] = False
+        tc.variables["NEKO_SCHEMA_ENABLE_MODULE"] = self.options.enable_module
         tc.variables["NEKO_SCHEMA_AUTO_FETCH_DEPS"] = False
         tc.generate()
         
