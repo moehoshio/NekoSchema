@@ -139,4 +139,56 @@ else()
     message(STATUS "NekoSchema tests disabled (NEKO_SCHEMA_BUILD_TESTS=OFF)")
 endif()
 
+
+# ================
+# == Install =====
+# ================
+
+include(GNUInstallDirs)
+include(CMakePackageConfigHelpers)
+
+# Install headers
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+    FILES_MATCHING 
+    PATTERN "*.hpp"
+    PATTERN "*.cppm"
+)
+
+# Install targets
+install(TARGETS NekoSchema
+    EXPORT NekoSchemaTargets
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+    FILE_SET CXX_MODULES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
+
+# Install export targets
+install(EXPORT NekoSchemaTargets
+    FILE NekoSchemaTargets.cmake
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/NekoSchema
+)
+
+# Create and install Config file
+configure_package_config_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/cmake/NekoSchemaConfig.cmake.in
+    ${CMAKE_CURRENT_BINARY_DIR}/NekoSchemaConfig.cmake
+    INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/NekoSchema
+)
+
+# Create and install Version file
+write_basic_package_version_file(
+    ${CMAKE_CURRENT_BINARY_DIR}/NekoSchemaConfigVersion.cmake
+    VERSION ${PROJECT_VERSION}
+    COMPATIBILITY SameMajorVersion
+)
+
+install(FILES
+    ${CMAKE_CURRENT_BINARY_DIR}/NekoSchemaConfig.cmake
+    ${CMAKE_CURRENT_BINARY_DIR}/NekoSchemaConfigVersion.cmake
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/NekoSchema
+)
+
 message(STATUS "Neko Schema End of configuration")

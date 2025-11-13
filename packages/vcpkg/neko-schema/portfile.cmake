@@ -16,6 +16,7 @@ vcpkg_cmake_configure(
     SOURCE_PATH "${SOURCE_PATH}"
     OPTIONS
         ${FEATURE_OPTIONS}
+        -DNEKO_SCHEMA_AUTO_FETCH_DEPS=OFF
 )
 
 vcpkg_cmake_install()

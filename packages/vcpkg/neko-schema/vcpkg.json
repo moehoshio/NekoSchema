@@ -16,6 +16,9 @@
     }
   ],
   "features": {
+    "module": {
+      "description": "Enable C++20 module support for NekoSchema"
+    },
     "tests": {
       "description": "Build tests for NekoSchema",
       "dependencies": [
@@ -24,9 +27,6 @@
           "version>=": "1.14.0"
         }
       ]
-    },
-    "module": {
-      "description": "Enable C++20 module support for NekoSchema"
     }
   }
 }
