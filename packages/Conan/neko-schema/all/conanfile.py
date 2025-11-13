@@ -17,10 +17,12 @@ class NekoSchemaConan(ConanFile):
     options = {
         "build_tests": [True, False],
         "build_module": [True, False],
+        "with_gtest": [True, False],
     }
     default_options = {
         "build_tests": False,
         "build_module": False,
+        "with_gtest": False,
     }
     
     # Header-only library
@@ -28,6 +30,12 @@ class NekoSchemaConan(ConanFile):
     no_copy_source = True
     
     exports_sources = "CMakeLists.txt", "include/*", "tests/*", "LICENSE", "README.md"
+    
+    def requirements(self):
+        if self.options.with_gtest:
+            self.test_requires("gtest/1.14.0")
+        elif self.options.build_tests:
+            self.test_requires("gtest/1.14.0")
     
     def layout(self):
         cmake_layout(self)
