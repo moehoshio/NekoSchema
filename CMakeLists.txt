@@ -124,7 +124,7 @@ if(NEKO_SCHEMA_BUILD_TESTS)
     target_compile_features(NekoSchema_tests PRIVATE cxx_std_20)
     
     include(GoogleTest)
-    gtest_discover_tests(NekoSchema_tests)
+    gtest_discover_tests(NekoSchema_tests DISCOVERY_MODE PRE_TEST)
     
     # Module-based tests (if module is enabled)
     if(NEKO_SCHEMA_BUILD_MODULE)
@@ -132,7 +132,7 @@ if(NEKO_SCHEMA_BUILD_TESTS)
         add_executable(NekoSchema_module_tests tests/schema_module_test.cpp)
         target_link_libraries(NekoSchema_module_tests PRIVATE NekoSchema_module GTest::gtest GTest::gtest_main)
         target_compile_features(NekoSchema_module_tests PRIVATE cxx_std_20)
-        gtest_discover_tests(NekoSchema_module_tests)
+        gtest_discover_tests(NekoSchema_module_tests DISCOVERY_MODE PRE_TEST)
     endif()
     
 else()
