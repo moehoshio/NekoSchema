@@ -17,6 +17,10 @@ vcpkg_cmake_configure(
 vcpkg_cmake_install()
 vcpkg_cmake_config_fixup(CONFIG_PATH lib/cmake/NekoSchema)
 
+# Create neko-schemaConfig.cmake to match CMake's expected naming convention
+file(WRITE "${CURRENT_PACKAGES_DIR}/share/${PORT}/neko-schemaConfig.cmake"
+    "include(\"\${CMAKE_CURRENT_LIST_DIR}/NekoSchemaConfig.cmake\")\n")
+
 file(REMOVE_RECURSE "${CURRENT_PACKAGES_DIR}/debug")
 file(REMOVE_RECURSE "${CURRENT_PACKAGES_DIR}/lib")
 

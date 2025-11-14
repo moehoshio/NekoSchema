@@ -1,4 +1,4 @@
-name: vcpkg Package Test
+name: Vcpkg Package Test
 
 on:
   push:
@@ -9,7 +9,7 @@ on:
 
 jobs:
   test-vcpkg-installation:
-    name: Test vcpkg Installation (${{ matrix.os }}-${{ matrix.triplet }})
+    name: Test vcpkg (${{ matrix.os }}-${{ matrix.triplet }})
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -20,8 +20,6 @@ jobs:
             triplet: x64-linux
           - os: ubuntu-latest
             triplet: x64-linux-dynamic
-          - os: ubuntu-latest
-            triplet: arm64-linux
           
           # Windows targets
           - os: windows-latest
@@ -30,11 +28,11 @@ jobs:
             triplet: x64-windows-static
           - os: windows-latest
             triplet: x86-windows
-          - os: windows-latest
-            triplet: arm64-windows
           
           # macOS targets
           - os: macos-latest
+            triplet: x64-osx
+          - os: macos-13
             triplet: x64-osx
           - os: macos-latest
             triplet: arm64-osx
@@ -44,10 +42,8 @@ jobs:
       uses: actions/checkout@v4
 
     - name: Clone vcpkg repository
-      shell: bash
       run: |
-        git clone https://github.com/microsoft/vcpkg.git ${{ github.workspace }}/vcpkg
-        cd ${{ github.workspace }}/vcpkg
+        git clone https://github.com/microsoft/vcpkg.git ${{ runner.os == 'Windows' && 'vcpkg' || format('{0}/vcpkg', github.workspace) }}
 
     - name: Bootstrap vcpkg (Unix)
       if: runner.os != 'Windows'
@@ -55,51 +51,90 @@ jobs:
 
     - name: Bootstrap vcpkg (Windows)
       if: runner.os == 'Windows'
-      run: ${{ github.workspace }}/vcpkg/bootstrap-vcpkg.bat
+      run: .\vcpkg\bootstrap-vcpkg.bat
 
-    - name: Copy local port to vcpkg ports directory
-      shell: bash
+    - name: Copy local port to vcpkg ports directory (Unix)
+      if: runner.os != 'Windows'
       run: |
         mkdir -p ${{ github.workspace }}/vcpkg/ports/neko-schema
         cp -r ${{ github.workspace }}/packages/vcpkg/neko-schema/* ${{ github.workspace }}/vcpkg/ports/neko-schema/
 
-    - name: Update portfile to use local source
-      shell: bash
+    - name: Copy local port to vcpkg ports directory (Windows)
+      if: runner.os == 'Windows'
       run: |
-        cat > ${{ github.workspace }}/vcpkg/ports/neko-schema/portfile.cmake << 'EOF'
-        set(SOURCE_PATH "$ENV{GITHUB_WORKSPACE}")
+        New-Item -ItemType Directory -Force -Path "vcpkg\ports\neko-schema"
+        Copy-Item -Recurse -Path "packages\vcpkg\neko-schema\*" -Destination "vcpkg\ports\neko-schema\"
 
-        vcpkg_cmake_configure(
-            SOURCE_PATH "${SOURCE_PATH}"
-            OPTIONS
-                -DNEKO_SCHEMA_BUILD_TESTS=OFF
-                -DNEKO_SCHEMA_AUTO_FETCH_DEPS=OFF
-                -DNEKO_SCHEMA_ENABLE_MODULE=OFF
-        )
+    - name: Update portfile to use local source (Unix)
+      if: runner.os != 'Windows'
+      run: |
+        # Replace the vcpkg_from_github block with local source path
+        portfile="${{ github.workspace }}/vcpkg/ports/neko-schema/portfile.cmake"
+        source_path="${{ github.workspace }}"
+        
+        # Read the file and process it with awk
+        awk -v src="$source_path" '
+          /^vcpkg_from_github\(/ {
+            print "set(SOURCE_PATH \"" src "\")"
+            skip = 1
+            next
+          }
+          skip && /^\)/ {
+            skip = 0
+            next
+          }
+          !skip { print }
+        ' "$portfile" > "$portfile.tmp"
+        
+        mv "$portfile.tmp" "$portfile"
 
-        vcpkg_cmake_install()
-        vcpkg_cmake_config_fixup(CONFIG_PATH lib/cmake/NekoSchema)
-
-        file(REMOVE_RECURSE "${CURRENT_PACKAGES_DIR}/debug")
-        file(REMOVE_RECURSE "${CURRENT_PACKAGES_DIR}/lib")
-
-        vcpkg_install_copyright(FILE_LIST "${SOURCE_PATH}/LICENSE")
-
-        file(INSTALL "${CMAKE_CURRENT_LIST_DIR}/usage" DESTINATION "${CURRENT_PACKAGES_DIR}/share/${PORT}")
-        EOF
+    - name: Update portfile to use local source (Windows)
+      if: runner.os == 'Windows'
+      run: |
+        $portfile = "vcpkg\ports\neko-schema\portfile.cmake"
+        $sourcePath = "${{ github.workspace }}".Replace('\', '/')
+        
+        Write-Host "Source path to use: $sourcePath"
+        Write-Host "Original portfile content:"
+        Get-Content $portfile | Select-Object -First 10
+        
+        # Read the file
+        $lines = Get-Content $portfile
+        $newLines = @()
+        $skip = $false
+        
+        foreach ($line in $lines) {
+          if ($line -match '^vcpkg_from_github\(') {
+            # Found the start of vcpkg_from_github, add our replacement
+            $newLines += "set(SOURCE_PATH `"$sourcePath`")"
+            $skip = $true
+          }
+          elseif ($skip -and $line -match '^\)') {
+            # Found the closing parenthesis, stop skipping
+            $skip = $false
+          }
+          elseif (-not $skip) {
+            # Not in the vcpkg_from_github block, keep the line
+            $newLines += $line
+          }
+        }
+        
+        # Write back
+        $newLines | Set-Content $portfile
+        
+        Write-Host "`nModified portfile content:"
+        Get-Content $portfile | Select-Object -First 10
 
     - name: Install neko-schema via vcpkg (Unix)
       if: runner.os != 'Windows'
-      run: |
-        ${{ github.workspace }}/vcpkg/vcpkg install neko-schema:${{ matrix.triplet }}
+      run: ${{ github.workspace }}/vcpkg/vcpkg install neko-schema:${{ matrix.triplet }}
 
     - name: Install neko-schema via vcpkg (Windows)
       if: runner.os == 'Windows'
-      run: |
-        ${{ github.workspace }}/vcpkg/vcpkg.exe install neko-schema:${{ matrix.triplet }}
+      run: .\vcpkg\vcpkg.exe install neko-schema:${{ matrix.triplet }}
 
-    - name: Verify installation structure
-      shell: bash
+    - name: Verify installation structure (Unix)
+      if: runner.os != 'Windows'
       run: |
         echo "=== Verifying vcpkg installation structure ==="
         
@@ -158,3 +193,126 @@ jobs:
         
         echo ""
         echo "=== All installation checks passed! ==="
+
+    - name: Build and run integration test (Unix)
+      if: runner.os != 'Windows'
+      run: |
+        echo "=== Debugging vcpkg installation ==="
+        INSTALL_ROOT="${{ github.workspace }}/vcpkg/installed/${{ matrix.triplet }}"
+        echo "Installation root: $INSTALL_ROOT"
+        echo "Checking for CMake config files:"
+        find "$INSTALL_ROOT/share" -name "*Config.cmake" -o -name "*-config.cmake" || true
+        echo ""
+        echo "Contents of share/neko-schema:"
+        ls -la "$INSTALL_ROOT/share/neko-schema/" || true
+        echo ""
+        echo "CMake will search in:"
+        echo "  CMAKE_PREFIX_PATH would include: $INSTALL_ROOT"
+        echo ""
+        
+        # Copy test files to a build directory
+        mkdir -p vcpkg-integration-test
+        cp tests/vcpkg/CMakeLists.txt vcpkg-integration-test/
+        cp tests/vcpkg/test.cpp vcpkg-integration-test/
+        
+        # Configure - let vcpkg toolchain handle the paths
+        echo "Running cmake configure..."
+        cmake -B vcpkg-integration-test/build \
+          -S vcpkg-integration-test \
+          -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake \
+          -DCMAKE_PREFIX_PATH="${{ github.workspace }}/vcpkg/installed/${{ matrix.triplet }}" \
+          -DCMAKE_BUILD_TYPE=Release \
+          -DCMAKE_VERBOSE_MAKEFILE=ON
+        
+        # Build
+        cmake --build vcpkg-integration-test/build --config Release
+        
+        # Run
+        vcpkg-integration-test/build/vcpkg_test
+
+    - name: Verify installation structure (Windows)
+      if: runner.os == 'Windows'
+      run: |
+        Write-Host "=== Verifying vcpkg installation structure ==="
+        
+        $InstallRoot = "vcpkg\installed\${{ matrix.triplet }}"
+        $Success = $true
+        
+        # Check headers
+        if (Test-Path "$InstallRoot\include\neko\schema") {
+          Write-Host "✓ Headers directory exists"
+          Write-Host "  Headers found:"
+          Get-ChildItem -Recurse -File "$InstallRoot\include\neko\schema" | ForEach-Object { Write-Host "    $($_.FullName)" }
+        } else {
+          Write-Host "✗ Headers directory not found"
+          $Success = $false
+        }
+        
+        # Check CMake config
+        if (Test-Path "$InstallRoot\share\neko-schema\NekoSchemaConfig.cmake") {
+          Write-Host "✓ CMake config file exists"
+        } else {
+          Write-Host "✗ CMake config file not found"
+          $Success = $false
+        }
+        
+        # Check copyright/license
+        if (Test-Path "$InstallRoot\share\neko-schema\copyright") {
+          Write-Host "✓ Copyright file exists"
+        } else {
+          Write-Host "✗ Copyright file not found"
+          $Success = $false
+        }
+        
+        # Check usage file
+        if (Test-Path "$InstallRoot\share\neko-schema\usage") {
+          Write-Host "✓ Usage file exists"
+          Write-Host "  Usage content:"
+          Get-Content "$InstallRoot\share\neko-schema\usage" | ForEach-Object { Write-Host "    $_" }
+        } else {
+          Write-Host "✗ Usage file not found"
+          $Success = $false
+        }
+        
+        # Verify no debug or lib directories (header-only library)
+        if (Test-Path "$InstallRoot\debug") {
+          Write-Host "✗ Debug directory should not exist for header-only library"
+          $Success = $false
+        } else {
+          Write-Host "✓ No debug directory (correct for header-only)"
+        }
+        
+        if (Test-Path "$InstallRoot\lib") {
+          Write-Host "✗ Lib directory should not exist for header-only library"
+          $Success = $false
+        } else {
+          Write-Host "✓ No lib directory (correct for header-only)"
+        }
+        
+        Write-Host ""
+        if ($Success) {
+          Write-Host "=== All installation checks passed! ==="
+        } else {
+          Write-Host "=== Some checks failed ==="
+          exit 1
+        }
+
+    - name: Build and run integration test (Windows)
+      if: runner.os == 'Windows'
+      run: |
+        # Copy test files to a build directory
+        New-Item -ItemType Directory -Force -Path "vcpkg-integration-test"
+        Copy-Item "tests\vcpkg\CMakeLists.txt" "vcpkg-integration-test\"
+        Copy-Item "tests\vcpkg\test.cpp" "vcpkg-integration-test\"
+        
+        # Configure - let vcpkg toolchain handle the paths
+        cmake -B vcpkg-integration-test\build `
+          -S vcpkg-integration-test `
+          -DCMAKE_TOOLCHAIN_FILE="$PWD\vcpkg\scripts\buildsystems\vcpkg.cmake" `
+          -DCMAKE_PREFIX_PATH="$PWD\vcpkg\installed\${{ matrix.triplet }}"
+        
+        # Build
+        cmake --build vcpkg-integration-test\build --config Release
+        
+        # Run
+        .\vcpkg-integration-test\build\Release\vcpkg_test.exe

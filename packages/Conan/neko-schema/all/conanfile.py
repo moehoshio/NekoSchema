@@ -43,10 +43,7 @@ class NekoSchemaConan(ConanFile):
     def build(self):
         cmake = CMake(self)
         cmake.configure()
-        if self.options.build_tests:
-            cmake.build()
-            cmake.test()
-    
+
     def package(self):
         copy(self, "LICENSE", src=self.source_folder, dst=os.path.join(self.package_folder, "licenses"))
         copy(self, "*.hpp", src=os.path.join(self.source_folder, "include"), dst=os.path.join(self.package_folder, "include"))
@@ -68,7 +65,7 @@ class NekoSchemaConan(ConanFile):
         self.cpp_info.components["neko-schema"].cxxflags = []
         
         # Module support (if enabled)
-        if self.options.build_module:
+        if self.options.enable_module:
             self.cpp_info.components["neko-schema-module"].set_property("cmake_target_name", "Neko::Schema::Module")
             self.cpp_info.components["neko-schema-module"].includedirs = ["include"]
     

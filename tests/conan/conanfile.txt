@@ -1,0 +1,6 @@
+[requires]
+neko-schema/1.0.2
+
+[generators]
+CMakeDeps
+CMakeToolchain
