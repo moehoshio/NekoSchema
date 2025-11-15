@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.14)
-project(NekoSchema VERSION 1.0.0 LANGUAGES CXX)
+project(NekoSchema VERSION 1.0.3 LANGUAGES CXX)
 
 # ================
 # === Config ====
@@ -183,6 +183,7 @@ write_basic_package_version_file(
     ${CMAKE_CURRENT_BINARY_DIR}/NekoSchemaConfigVersion.cmake
     VERSION ${PROJECT_VERSION}
     COMPATIBILITY SameMajorVersion
+    ARCH_INDEPENDENT
 )
 
 install(FILES

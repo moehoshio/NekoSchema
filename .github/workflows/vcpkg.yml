@@ -151,7 +151,7 @@ jobs:
         fi
         
         # Check CMake config
-        if [ -f "$INSTALL_ROOT/share/neko-schema/NekoSchemaConfig.cmake" ]; then
+        if [ -f "$INSTALL_ROOT/share/nekoschema/NekoSchemaConfig.cmake" ]; then
           echo "✓ CMake config file exists"
         else
           echo "✗ CMake config file not found"
@@ -196,39 +196,19 @@ jobs:
 
     - name: Build and run integration test (Unix)
       if: runner.os != 'Windows'
+      working-directory: tests/vcpkg
       run: |
-        echo "=== Debugging vcpkg installation ==="
-        INSTALL_ROOT="${{ github.workspace }}/vcpkg/installed/${{ matrix.triplet }}"
-        echo "Installation root: $INSTALL_ROOT"
-        echo "Checking for CMake config files:"
-        find "$INSTALL_ROOT/share" -name "*Config.cmake" -o -name "*-config.cmake" || true
-        echo ""
-        echo "Contents of share/neko-schema:"
-        ls -la "$INSTALL_ROOT/share/neko-schema/" || true
-        echo ""
-        echo "CMake will search in:"
-        echo "  CMAKE_PREFIX_PATH would include: $INSTALL_ROOT"
-        echo ""
-        
-        # Copy test files to a build directory
-        mkdir -p vcpkg-integration-test
-        cp tests/vcpkg/CMakeLists.txt vcpkg-integration-test/
-        cp tests/vcpkg/test.cpp vcpkg-integration-test/
-        
-        # Configure - let vcpkg toolchain handle the paths
-        echo "Running cmake configure..."
-        cmake -B vcpkg-integration-test/build \
-          -S vcpkg-integration-test \
+        # Configure
+        cmake -B ./build -S . \
           -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake \
           -DCMAKE_PREFIX_PATH="${{ github.workspace }}/vcpkg/installed/${{ matrix.triplet }}" \
-          -DCMAKE_BUILD_TYPE=Release \
-          -DCMAKE_VERBOSE_MAKEFILE=ON
+          -DCMAKE_BUILD_TYPE=Release
         
         # Build
-        cmake --build vcpkg-integration-test/build --config Release
+        cmake --build ./build --config Release
         
         # Run
-        vcpkg-integration-test/build/vcpkg_test
+        ./build/vcpkg_test
 
     - name: Verify installation structure (Windows)
       if: runner.os == 'Windows'
@@ -249,7 +229,7 @@ jobs:
         }
         
         # Check CMake config
-        if (Test-Path "$InstallRoot\share\neko-schema\NekoSchemaConfig.cmake") {
+        if (Test-Path "$InstallRoot\share\nekoschema\NekoSchemaConfig.cmake") {
           Write-Host "✓ CMake config file exists"
         } else {
           Write-Host "✗ CMake config file not found"
@@ -299,20 +279,15 @@ jobs:
 
     - name: Build and run integration test (Windows)
       if: runner.os == 'Windows'
+      working-directory: tests/vcpkg
       run: |
-        # Copy test files to a build directory
-        New-Item -ItemType Directory -Force -Path "vcpkg-integration-test"
-        Copy-Item "tests\vcpkg\CMakeLists.txt" "vcpkg-integration-test\"
-        Copy-Item "tests\vcpkg\test.cpp" "vcpkg-integration-test\"
-        
-        # Configure - let vcpkg toolchain handle the paths
-        cmake -B vcpkg-integration-test\build `
-          -S vcpkg-integration-test `
-          -DCMAKE_TOOLCHAIN_FILE="$PWD\vcpkg\scripts\buildsystems\vcpkg.cmake" `
-          -DCMAKE_PREFIX_PATH="$PWD\vcpkg\installed\${{ matrix.triplet }}"
+        # Configure
+        cmake -B .\build -S . `
+          -DCMAKE_TOOLCHAIN_FILE="$PWD\..\..\vcpkg\scripts\buildsystems\vcpkg.cmake" `
+          -DCMAKE_PREFIX_PATH="$PWD\..\..\vcpkg\installed\${{ matrix.triplet }}"
         
         # Build
-        cmake --build vcpkg-integration-test\build --config Release
+        cmake --build .\build --config Release
         
         # Run
-        .\vcpkg-integration-test\build\Release\vcpkg_test.exe
+        .\build\Release\vcpkg_test.exe

@@ -1,10 +1,12 @@
-vcpkg_from_github(
+﻿vcpkg_from_github(
     OUT_SOURCE_PATH SOURCE_PATH
     REPO moehoshio/NekoSchema
-    REF v1.0.2
-    SHA512 15645E27F0B475120CE5DE77536961A3A2F9586E7E933C154A6958607D09EDA72D138F73FD57A4361117BA6E6EB8846142566736C03D9DF826439BA0B19076E8
+    REF v1.0.3
+    SHA512 48217CF53380C279498883F4632AB4A3B4646CBE301176FCC278BC955D7CBAA8A5C1E74C1E4625266F5FFF5A2F5809BC944A4EC2895E94D87B59463F090E76F4
     HEAD_REF main
 )
+
+set(VCPKG_BUILD_TYPE release) # header-only port
 
 vcpkg_cmake_configure(
     SOURCE_PATH "${SOURCE_PATH}"
@@ -15,13 +17,8 @@ vcpkg_cmake_configure(
 )
 
 vcpkg_cmake_install()
-vcpkg_cmake_config_fixup(CONFIG_PATH lib/cmake/NekoSchema)
+vcpkg_cmake_config_fixup(CONFIG_PATH lib/cmake/NekoSchema PACKAGE_NAME nekoschema)
 
-# Create neko-schemaConfig.cmake to match CMake's expected naming convention
-file(WRITE "${CURRENT_PACKAGES_DIR}/share/${PORT}/neko-schemaConfig.cmake"
-    "include(\"\${CMAKE_CURRENT_LIST_DIR}/NekoSchemaConfig.cmake\")\n")
-
-file(REMOVE_RECURSE "${CURRENT_PACKAGES_DIR}/debug")
 file(REMOVE_RECURSE "${CURRENT_PACKAGES_DIR}/lib")
 
 vcpkg_install_copyright(FILE_LIST "${SOURCE_PATH}/LICENSE")

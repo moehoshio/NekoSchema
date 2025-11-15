@@ -93,58 +93,32 @@ jobs:
       run: |
         conan list "neko-schema/*"
 
-    - name: Create test consumer project (Unix)
-      if: runner.os != 'Windows'
-      run: |
-        mkdir -p conan-test
-        cp tests/conan/conanfile.txt conan-test/
-        cp tests/conan/CMakeLists.txt conan-test/
-        cp tests/conan/test.cpp conan-test/
-
-    - name: Create test consumer project (Windows)
-      if: runner.os == 'Windows'
-      run: |
-        New-Item -ItemType Directory -Force -Path "conan-test"
-        Copy-Item "tests\conan\conanfile.txt" "conan-test\"
-        Copy-Item "tests\conan\CMakeLists.txt" "conan-test\"
-        Copy-Item "tests\conan\test.cpp" "conan-test\"
-
-    - name: Install dependencies with Conan (Unix)
-      if: runner.os != 'Windows'
-      working-directory: conan-test
-      run: |
-        conan install . --build=missing
-
-    - name: Install dependencies with Conan (Windows)
-      if: runner.os == 'Windows'
-      working-directory: conan-test
-      run: |
-        conan install . --build=missing
+    - name: Install dependencies with Conan
+      working-directory: tests/conan
+      run: conan install . --build=missing
 
     - name: Configure test project (Unix)
       if: runner.os != 'Windows'
-      working-directory: conan-test
-      run: |
-        cmake -B build -S . -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
+      working-directory: tests/conan
+      run: cmake -B ./build -S . -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
 
     - name: Configure test project (Windows)
       if: runner.os == 'Windows'
-      working-directory: conan-test
-      run: |
-        cmake -B build -S . -DCMAKE_TOOLCHAIN_FILE="$PWD/conan_toolchain.cmake"
+      working-directory: tests/conan
+      run: cmake -B .\build -S . -DCMAKE_TOOLCHAIN_FILE="$PWD/conan_toolchain.cmake"
 
     - name: Build test project
-      working-directory: conan-test
-      run: cmake --build build --config Release
+      working-directory: tests/conan
+      run: cmake --build ./build --config Release
 
     - name: Run test executable (Unix)
       if: runner.os != 'Windows'
-      working-directory: conan-test
+      working-directory: tests/conan
       run: ./build/conan_test
 
     - name: Run test executable (Windows)
       if: runner.os == 'Windows'
-      working-directory: conan-test
+      working-directory: tests/conan
       run: .\build\Release\conan_test.exe
 
     - name: Verify package files (Unix)
@@ -153,11 +127,11 @@ jobs:
         echo "=== Verifying Conan package structure ==="
         
         # Get package reference
-        PKG_REF=$(conan list "neko-schema/1.0.2:*" --format=compact | grep "neko-schema/1.0.2" | head -1)
+        PKG_REF=$(conan list "neko-schema/*:*" --format=compact | grep "neko-schema/" | head -1)
         echo "Package reference: $PKG_REF"
         
         # Show package info
-        conan list "neko-schema/1.0.2:*"
+        conan list "neko-schema/*"
         
         echo ""
         echo "=== Conan package verification complete ==="
@@ -168,7 +142,7 @@ jobs:
         Write-Host "=== Verifying Conan package structure ==="
         
         # Show package info
-        conan list "neko-schema/1.0.2:*"
+        conan list "neko-schema/*"
         
         Write-Host ""
         Write-Host "=== Conan package verification complete ==="

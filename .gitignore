@@ -83,3 +83,10 @@ node_modules/
 
 # Copy files
 *_copy.*
+
+# Conan generated files
+conan_toolchain.cmake
+conaninfo.txt
+conanbuildinfo.*
+graph_info.json
+CMakeUserPresets.json
