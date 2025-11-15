@@ -1,5 +1,5 @@
 [requires]
-neko-schema/1.0.3
+neko-schema/[*]
 
 [generators]
 CMakeDeps
