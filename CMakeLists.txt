@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.14)
-project(NekoSchema VERSION 1.0.3 LANGUAGES CXX)
+project(NekoSchema VERSION 1.1.0 LANGUAGES CXX)
 
 # ================
 # === Config ====
@@ -127,7 +127,7 @@ if(NEKO_SCHEMA_BUILD_TESTS)
     gtest_discover_tests(NekoSchema_tests DISCOVERY_MODE PRE_TEST)
     
     # Module-based tests (if module is enabled)
-    if(NEKO_SCHEMA_BUILD_MODULE)
+    if(NEKO_SCHEMA_ENABLE_MODULE)
         message(STATUS "NekoSchema module tests enabled")
         add_executable(NekoSchema_module_tests tests/schema_module_test.cpp)
         target_link_libraries(NekoSchema_module_tests PRIVATE NekoSchema_module GTest::gtest GTest::gtest_main)

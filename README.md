@@ -22,7 +22,7 @@ NekoSchema serves as a foundational module that defines common types, enumeratio
 ## Requirements
 
 - C++20 or higher compatible compiler
-- CMake 3.14 or higher (if using CMake)
+- CMake 3.14 or higher
 - Git
 
 ## Integration
@@ -45,44 +45,6 @@ FetchContent_MakeAvailable(NekoSchema)
 # Define your target and link NekoSchema
 add_executable(your_target main.cpp)
 
-target_link_libraries(your_target PRIVATE NekoSchema)
-```
-
-### Conan
-
-Add NekoSchema to your `conanfile.txt`:
-
-```ini
-[requires]
-nekoshema/1.0
-
-[generators]
-CMakeDeps
-CMakeToolchain
-```
-
-Or use it in your `conanfile.py`:
-
-```python
-from conan import ConanFile
-
-class YourProject(ConanFile):
-    requires = "neko-schema/1.0"
-    generators = "CMakeDeps", "CMakeToolchain"
-```
-
-Then install and use:
-
-```shell
-conan install . --build=missing
-cmake -B build -DCMAKE_TOOLCHAIN_FILE=build/conan_toolchain.cmake
-cmake --build build
-```
-
-In your CMakeLists.txt:
-
-```cmake
-find_package(NekoSchema REQUIRED)
 target_link_libraries(your_target PRIVATE Neko::Schema)
 ```
 
@@ -102,40 +64,45 @@ Or add it to your `vcpkg.json`:
 }
 ```
 
-**Optional Features:**
-
-Install with tests (includes GTest):
-
-```shell
-vcpkg install neko-schema[tests]
-```
-
-Install with C++20 module support:
-
-```shell
-vcpkg install neko-schema[module]
-```
-
-Install with all features:
-
-```shell
-vcpkg install neko-schema[tests,module]
-```
-
-In your `vcpkg.json` with features:
-
-```json
-{
-  "dependencies": [
-    {
-      "name": "neko-schema",
-      "features": ["tests", "module"]
-    }
-  ]
-}
-```
-
 Then in your CMakeLists.txt:
+
+```cmake
+find_package(NekoSchema CONFIG REQUIRED)
+target_link_libraries(your_target PRIVATE Neko::Schema)
+```
+
+### Conan
+
+Add NekoSchema to your `conanfile.txt`:
+
+```ini
+[requires]
+neko-schema/*
+
+[generators]
+CMakeDeps
+CMakeToolchain
+```
+
+Or use it in your `conanfile.py`:
+
+```python
+from conan import ConanFile
+
+class YourProject(ConanFile):
+    requires = "neko-schema/*"
+    generators = "CMakeDeps", "CMakeToolchain"
+```
+
+Then install and use:
+
+```shell
+conan install . --build=missing
+cmake -B build -DCMAKE_TOOLCHAIN_FILE=build/conan_toolchain.cmake
+cmake --build build
+```
+
+In your CMakeLists.txt:
 
 ```cmake
 find_package(NekoSchema CONFIG REQUIRED)
@@ -196,6 +163,7 @@ target_link_libraries(your_target PRIVATE Neko::Schema::Module)
 Instead of including headers, simply import the module:
 
 ```cpp
+#include <iostream>
 import neko.schema;
 
 int main() {
@@ -211,13 +179,6 @@ int main() {
     return 0;
 }
 ```
-
-### Compiler Requirements for Modules
-
-- **MSVC**: Visual Studio 2019 16.10+ or Visual Studio 2022
-- **GCC**: Version 11.0+
-- **Clang**: Version 16.0+
-- **CMake**: Version 3.28+ (recommended for full module support)
 
 ## Type Definitions
 
@@ -272,21 +233,6 @@ void anotherFunction(const neko::SrcLocInfo & srcloc) {
 int main() {
     exampleFunction(); // Automatically captures the call site information
     anotherFunction(neko::SrcLocInfo("file.cpp", 2, "CustomFunction")); // You can also provide custom source location
-}
-```
-
-## Constexpr Map
-
-```cpp
-#include <neko/schema/constexprMap.hpp>
-
-int main(){
-constexpr neko::Map<neko::strview, neko::uint32> map{
-    {"one", 1},
-    {"two", 2},
-    {"three", 3}
-};
-static_assert(map.at("two") == 2);
 }
 ```
 

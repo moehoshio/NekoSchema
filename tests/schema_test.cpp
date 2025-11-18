@@ -2,7 +2,6 @@
 #include <neko/schema/types.hpp>
 #include <neko/schema/exception.hpp>
 #include <neko/schema/srcLoc.hpp>
-#include <neko/schema/constexprMap.hpp>
 
 #include <string>
 #include <sstream>
@@ -123,84 +122,6 @@ TEST_F(SrcLocTest, PartialInfo) {
     // Test with only file and line
     SrcLocInfo info2("test.cpp", 10, nullptr);
     EXPECT_TRUE(info2.hasInfo());
-}
-
-// =============================================================================
-// ConstexprMap Tests
-// =============================================================================
-
-class ConstexprMapTest : public ::testing::Test {
-protected:
-    void SetUp() override {}
-    void TearDown() override {}
-};
-
-TEST_F(ConstexprMapTest, BasicFunctionality) {
-    constexpr auto map = ConstexprMap{std::array{
-        std::make_pair(1, "one"),
-        std::make_pair(2, "two"),
-        std::make_pair(3, "three")
-    }};
-    
-    EXPECT_EQ(map.size(), 3u);
-    EXPECT_FALSE(map.empty());
-    
-    auto result1 = map.find(1);
-    ASSERT_TRUE(result1.has_value());
-    EXPECT_STREQ(result1.value(), "one");
-    
-    auto result2 = map.find(2);
-    ASSERT_TRUE(result2.has_value());
-    EXPECT_STREQ(result2.value(), "two");
-    
-    auto result3 = map.find(3);
-    ASSERT_TRUE(result3.has_value());
-    EXPECT_STREQ(result3.value(), "three");
-    
-    auto result_not_found = map.find(4);
-    EXPECT_FALSE(result_not_found.has_value());
-}
-
-TEST_F(ConstexprMapTest, EmptyMap) {
-    constexpr auto empty_map = ConstexprMap{std::array<std::pair<int, const char*>, 0>{}};
-    
-    EXPECT_EQ(empty_map.size(), 0u);
-    EXPECT_TRUE(empty_map.empty());
-    
-    auto result = empty_map.find(1);
-    EXPECT_FALSE(result.has_value());
-}
-
-TEST_F(ConstexprMapTest, StringKeyMap) {
-    using namespace std::string_view_literals;
-    constexpr auto str_map = ConstexprMap{std::array{
-        std::make_pair("key1"sv, 100),
-        std::make_pair("key2"sv, 200),
-        std::make_pair("key3"sv, 300)
-    }};
-    
-    auto result = str_map.find("key2"sv);
-    ASSERT_TRUE(result.has_value());
-    EXPECT_EQ(result.value(), 200);
-    
-    auto not_found = str_map.find("key4"sv);
-    EXPECT_FALSE(not_found.has_value());
-}
-
-TEST_F(ConstexprMapTest, Iterator) {
-    constexpr auto map = ConstexprMap{std::array{
-        std::make_pair(1, "a"),
-        std::make_pair(2, "b"),
-        std::make_pair(3, "c")
-    }};
-    
-    int count = 0;
-    for (const auto& [key, value] : map) {
-        count++;
-        EXPECT_TRUE(key >= 1 && key <= 3);
-        EXPECT_TRUE(value != nullptr);
-    }
-    EXPECT_EQ(count, 3);
 }
 
 // =============================================================================
@@ -347,23 +268,6 @@ TEST_F(IntegrationTest, ExceptionWithTypesAndSrcLoc) {
     EXPECT_STREQ(error.getFunc(), "test_function");
 }
 
-TEST_F(IntegrationTest, ConstexprMapWithTypes) {
-    // Test ConstexprMap with neko types
-    constexpr auto statusMap = ConstexprMap{std::array{
-        std::make_pair(static_cast<uint8>(Priority::Low), State::Completed),
-        std::make_pair(static_cast<uint8>(Priority::Normal), State::ActionNeeded),
-        std::make_pair(static_cast<uint8>(Priority::High), State::RetryRequired),
-        std::make_pair(static_cast<uint8>(Priority::Critical), State::ActionNeeded)
-    }};
-    
-    auto result = statusMap.find(static_cast<uint8>(Priority::High));
-    ASSERT_TRUE(result.has_value());
-    EXPECT_EQ(result.value(), State::RetryRequired);
-    
-    auto notFound = statusMap.find(99);
-    EXPECT_FALSE(notFound.has_value());
-}
-
 // =============================================================================
 // Edge Cases and Error Conditions
 // =============================================================================
@@ -373,32 +277,6 @@ protected:
     void SetUp() override {}
     void TearDown() override {}
 };
-
-TEST_F(EdgeCaseTest, LargeConstexprMap) {
-    // Test with a larger map
-    constexpr auto largeMap = ConstexprMap{std::array{
-        std::make_pair(0, "zero"), std::make_pair(1, "one"), std::make_pair(2, "two"),
-        std::make_pair(3, "three"), std::make_pair(4, "four"), std::make_pair(5, "five"),
-        std::make_pair(6, "six"), std::make_pair(7, "seven"), std::make_pair(8, "eight"),
-        std::make_pair(9, "nine")
-    }};
-    
-    EXPECT_EQ(largeMap.size(), 10u);
-    
-    // Test first and last elements
-    auto first = largeMap.find(0);
-    ASSERT_TRUE(first.has_value());
-    EXPECT_STREQ(first.value(), "zero");
-    
-    auto last = largeMap.find(9);
-    ASSERT_TRUE(last.has_value());
-    EXPECT_STREQ(last.value(), "nine");
-    
-    // Test middle element
-    auto middle = largeMap.find(5);
-    ASSERT_TRUE(middle.has_value());
-    EXPECT_STREQ(middle.value(), "five");
-}
 
 TEST_F(EdgeCaseTest, ExceptionNesting) {
     // Test nested exception functionality
@@ -431,24 +309,6 @@ protected:
     void SetUp() override {}
     void TearDown() override {}
 };
-
-TEST_F(PerformanceTest, ConstexprMapLookupSpeed) {
-    constexpr auto map = ConstexprMap{std::array{
-        std::make_pair(1, "one"), std::make_pair(2, "two"), std::make_pair(3, "three"),
-        std::make_pair(4, "four"), std::make_pair(5, "five"), std::make_pair(6, "six"),
-        std::make_pair(7, "seven"), std::make_pair(8, "eight"), std::make_pair(9, "nine"),
-        std::make_pair(10, "ten")
-    }};
-    
-    // Perform multiple lookups (this is more of a smoke test than a real perf test)
-    for (int i = 0; i < 1000; ++i) {
-        auto result = map.find(i % 10 + 1);
-        if (i % 10 == 0) {
-            ASSERT_TRUE(result.has_value());
-            EXPECT_STREQ(result.value(), "one");
-        }
-    }
-}
 
 // =============================================================================
 // Main Test Runner

@@ -4,12 +4,22 @@
  * @details This test file uses the C++20 module interface instead of traditional headers
  */
 
-import neko.schema;
+// Include GTest and standard headers BEFORE importing the module
+// This is necessary to avoid symbol conflicts with MSVC's module implementation
 
-#include <gtest/gtest.h>
-#include <string>
+#if defined(__cpp_lib_modules) && (__cpp_lib_modules > 202207L)
+import std.core;
+import std.string;
+import std.exception;
+#else
 #include <sstream>
 #include <stdexcept>
+#include <string>
+#endif
+
+#include <gtest/gtest.h>
+
+import neko.schema;
 
 using namespace neko;
 
@@ -29,7 +39,7 @@ TEST_F(ModuleTypesTest, BasicTypesSize) {
     EXPECT_EQ(sizeof(uint32), 4u);
     EXPECT_EQ(sizeof(uint16), 2u);
     EXPECT_EQ(sizeof(uint8), 1u);
-    
+
     EXPECT_EQ(sizeof(int64), 8u);
     EXPECT_EQ(sizeof(int32), 4u);
     EXPECT_EQ(sizeof(int16), 2u);
@@ -38,10 +48,10 @@ TEST_F(ModuleTypesTest, BasicTypesSize) {
 
 TEST_F(ModuleTypesTest, StringTypes) {
     // Test string type aliases
-    const char* test_cstr = "test";
+    const char *test_cstr = "test";
     cstr c = test_cstr;
     EXPECT_STREQ(c, "test");
-    
+
     strview sv = "test_view";
     EXPECT_EQ(sv, "test_view");
     EXPECT_EQ(sv.size(), 9u);
@@ -58,7 +68,7 @@ TEST_F(ModuleTypesTest, StateEnum) {
     State completed = State::Completed;
     State actionNeeded = State::ActionNeeded;
     State retryRequired = State::RetryRequired;
-    
+
     EXPECT_NE(completed, actionNeeded);
     EXPECT_NE(actionNeeded, retryRequired);
     EXPECT_NE(completed, retryRequired);
@@ -100,7 +110,7 @@ protected:
 
 TEST_F(ModuleSrcLocTest, DefaultConstruction) {
     SrcLocInfo info;
-    
+
     // The default constructor should capture current location
     EXPECT_TRUE(info.hasInfo());
     EXPECT_NE(info.getLine(), 0u);
@@ -110,7 +120,7 @@ TEST_F(ModuleSrcLocTest, DefaultConstruction) {
 
 TEST_F(ModuleSrcLocTest, ManualConstruction) {
     SrcLocInfo info("test.cpp", 42, "testFunction");
-    
+
     EXPECT_TRUE(info.hasInfo());
     EXPECT_EQ(info.getLine(), 42u);
     EXPECT_STREQ(info.getFile(), "test.cpp");
@@ -119,7 +129,7 @@ TEST_F(ModuleSrcLocTest, ManualConstruction) {
 
 TEST_F(ModuleSrcLocTest, EmptyInfo) {
     SrcLocInfo info(nullptr, 0, nullptr);
-    
+
     EXPECT_FALSE(info.hasInfo());
     EXPECT_EQ(info.getLine(), 0u);
     EXPECT_EQ(info.getFile(), nullptr);
@@ -138,7 +148,7 @@ protected:
 
 TEST_F(ModuleExceptionTest, BasicException) {
     neko::ex::Exception ex("Test error");
-    
+
     EXPECT_STREQ(ex.what(), "Test error");
     EXPECT_TRUE(ex.hasSrcLocInfo());
 }
@@ -146,7 +156,7 @@ TEST_F(ModuleExceptionTest, BasicException) {
 TEST_F(ModuleExceptionTest, ExceptionWithLocation) {
     SrcLocInfo loc("test.cpp", 100, "testFunc");
     neko::ex::Exception ex("Test error", loc);
-    
+
     EXPECT_STREQ(ex.what(), "Test error");
     EXPECT_TRUE(ex.hasSrcLocInfo());
     EXPECT_EQ(ex.getLine(), 100u);
@@ -155,99 +165,23 @@ TEST_F(ModuleExceptionTest, ExceptionWithLocation) {
 }
 
 TEST_F(ModuleExceptionTest, CStringConstructor) {
-    const char* msg = "C-string error";
+    const char *msg = "C-string error";
     neko::ex::Exception ex(msg);
-    
+
     EXPECT_STREQ(ex.what(), "C-string error");
 }
 
 TEST_F(ModuleExceptionTest, InvalidOperationException) {
     neko::ex::InvalidOperation ex("Invalid operation");
-    
+
     EXPECT_STREQ(ex.what(), "Invalid operation");
     EXPECT_TRUE(ex.hasSrcLocInfo());
 }
 
 TEST_F(ModuleExceptionTest, ArgumentException) {
     neko::ex::InvalidArgument ex("Bad argument");
-    
+
     EXPECT_STREQ(ex.what(), "Bad argument");
-}
-
-// =============================================================================
-// Module Map Tests
-// =============================================================================
-
-class ModuleMapTest : public ::testing::Test {
-protected:
-    void SetUp() override {}
-    void TearDown() override {}
-};
-
-TEST_F(ModuleMapTest, BasicUsage) {
-    constexpr ConstexprMap<int, const char*, 3> map = {{
-        {1, "one"},
-        {2, "two"},
-        {3, "three"}
-    }};
-    
-    auto result1 = map.find(1);
-    EXPECT_TRUE(result1.has_value());
-    EXPECT_STREQ(result1.value(), "one");
-    
-    auto result2 = map.find(2);
-    EXPECT_TRUE(result2.has_value());
-    EXPECT_STREQ(result2.value(), "two");
-    
-    auto result3 = map.find(3);
-    EXPECT_TRUE(result3.has_value());
-    EXPECT_STREQ(result3.value(), "three");
-}
-
-TEST_F(ModuleMapTest, NotFound) {
-    constexpr ConstexprMap<int, const char*, 2> map = {{
-        {1, "one"},
-        {2, "two"}
-    }};
-    
-    auto result = map.find(99);
-    EXPECT_FALSE(result.has_value());
-}
-
-TEST_F(ModuleMapTest, Size) {
-    constexpr ConstexprMap<int, int, 5> map = {{
-        {1, 10},
-        {2, 20},
-        {3, 30},
-        {4, 40},
-        {5, 50}
-    }};
-    
-    EXPECT_EQ(map.size(), 5u);
-    EXPECT_FALSE(map.empty());
-}
-
-TEST_F(ModuleMapTest, EmptyMap) {
-    constexpr ConstexprMap<int, int, 0> map = {{}};
-    
-    EXPECT_EQ(map.size(), 0u);
-    EXPECT_TRUE(map.empty());
-}
-
-TEST_F(ModuleMapTest, Iteration) {
-    constexpr ConstexprMap<int, int, 3> map = {{
-        {1, 100},
-        {2, 200},
-        {3, 300}
-    }};
-    
-    int count = 0;
-    for (const auto& [key, value] : map) {
-        count++;
-        EXPECT_EQ(value, key * 100);
-    }
-    
-    EXPECT_EQ(count, 3);
 }
 
 // =============================================================================
