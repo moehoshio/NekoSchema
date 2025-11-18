@@ -7,15 +7,7 @@
 
 module;
 
-#if defined(__cpp_lib_modules) && (__cpp_lib_modules > 202207L)
-import std.core;
-import std.string;
-import std.exception;
-import std.source_location;
-import std.array;
-import std.optional;
-import std.utility;
-#else
+#if !defined(__cpp_lib_modules) || (__cpp_lib_modules < 202207L)
 // Global module fragment - include headers that should not be exported
 #include <array>
 #include <cstddef>

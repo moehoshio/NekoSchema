@@ -9,9 +9,9 @@
  *   Clang: clang++ -std=c++20 -fmodules module_example.cpp
  */
 
-import neko.schema;
-
 #include <iostream>
+
+import neko.schema;
 
 int main() {
     std::cout << "=== NekoSchema C++20 Module Example ===" << std::endl << std::endl;

@@ -7,14 +7,18 @@
 // Include GTest and standard headers BEFORE importing the module
 // This is necessary to avoid symbol conflicts with MSVC's module implementation
 
-#if defined(__cpp_lib_modules) && (__cpp_lib_modules > 202207L)
-import std.core;
-import std.string;
-import std.exception;
-#else
+#if !defined(__cpp_lib_modules) || (__cpp_lib_modules < 202207L)
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#else
+import std.core;
+import std.string;
+import std.exception;
+import std.source_location;
+import std.array;
+import std.optional;
+import std.utility;
 #endif
 
 #include <gtest/gtest.h>
