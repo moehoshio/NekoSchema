@@ -6,7 +6,7 @@ import os
 
 class NekoSchemaConan(ConanFile):
     name = "neko-schema"
-    version = "1.0.4"
+    version = "1.1.0"
     license = "MIT OR Apache-2.0"
     author = "moehoshio"
     url = "https://github.com/moehoshio/NekoSchema"
@@ -74,4 +74,5 @@ class NekoSchemaConan(ConanFile):
     
     def package_id(self):
         self.info.clear()
+
 
