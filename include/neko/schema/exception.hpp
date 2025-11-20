@@ -4,11 +4,13 @@
  */
 #pragma once
 
+#if !defined(NEKO_SCHEMA_ENABLE_MODULE) || (NEKO_SCHEMA_ENABLE_MODULE == false)
 #include <neko/schema/types.hpp>
 #include <neko/schema/srcLoc.hpp>
 
 #include <exception>
 #include <string>
+#endif
 
 /**
  * @brief Exception classes for the NekoLauncher

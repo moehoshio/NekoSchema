@@ -1,7 +1,9 @@
 #pragma once
 
+#if !defined(NEKO_SCHEMA_ENABLE_MODULE) || (NEKO_SCHEMA_ENABLE_MODULE == false)
 #include <cstdint>
 #include <string_view>
+#endif
 
 namespace neko {
 

@@ -7,20 +7,21 @@
 
 module;
 
-#if !defined(__cpp_lib_modules) || (__cpp_lib_modules < 202207L)
+#if defined(__cpp_lib_modules) && (__cpp_lib_modules >= 202207L)
+import std;
+#else
 // Global module fragment - include headers that should not be exported
-#include <array>
-#include <cstddef>
 #include <cstdint>
-#include <exception>
-#include <optional>
-#include <source_location>
-#include <string>
 #include <string_view>
-#include <utility>
+#include <string>
+#include <exception>
+#include <source_location>
 #endif
 
 export module neko.schema;
+
+// Control header files to not import dependencies (dependencies are declared and imported by the cppm)
+#define NEKO_SCHEMA_ENABLE_MODULE true
 
 // Export all declarations from the headers by including them in an export block
 export {

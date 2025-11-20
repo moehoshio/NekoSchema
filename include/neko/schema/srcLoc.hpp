@@ -8,13 +8,16 @@
     #error "Neko SrcLoc Cannot find header <source_location>."
 #endif
 
+#if !defined(NEKO_SCHEMA_ENABLE_MODULE) || (NEKO_SCHEMA_ENABLE_MODULE == false)
 #include <source_location>
+#include <neko/schema/types.hpp>
+#endif
 
 #if !defined(__cpp_lib_source_location) || __cpp_lib_source_location < 201907L
     #error "Neko SrcLoc requires <source_location> support."
 #endif
 
-#include <neko/schema/types.hpp>
+
 
 namespace neko {
 

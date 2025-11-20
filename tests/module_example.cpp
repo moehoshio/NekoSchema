@@ -69,25 +69,6 @@ int main() {
         std::cout << "  Exception location: " << e.getFile() << ":" << e.getLine() << std::endl;
     }
     std::cout << std::endl;
-    
-    // =========================================================================
-    // Constexpr Map
-    // =========================================================================
-    std::cout << "5. Constexpr Map:" << std::endl;
-    
-    constexpr neko::ConstexprMap<int, const char*, 3> statusMap = {{
-        {0, "Success"},
-        {1, "Warning"},
-        {2, "Error"}
-    }};
-    
-    auto result = statusMap.find(1);
-    if (result.has_value()) {
-        std::cout << "  Status code 1: " << result.value() << std::endl;
-    }
-    std::cout << "  Map size: " << statusMap.size() << std::endl;
-    std::cout << std::endl;
-    
     std::cout << "=== Example completed successfully ===" << std::endl;
     
     return 0;
