@@ -25,7 +25,7 @@ export module neko.schema;
 
 // Export all declarations from the headers by including them in an export block
 export {
-#include "exception.hpp"
-#include "srcLoc.hpp"
 #include "types.hpp"
+#include "srcLoc.hpp"
+#include "exception.hpp"
 }
