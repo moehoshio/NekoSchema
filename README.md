@@ -9,13 +9,14 @@ NekoSchema serves as a foundational module that defines common types, enumeratio
 [![License](https://img.shields.io/badge/License-MIT%20OR%20Apache--2.0-blue.svg)](LICENSE)
 ![Require](https://img.shields.io/badge/%20Require%20-%3E=%20C++%2020-orange.svg)
 [![CMake](https://img.shields.io/badge/CMake-3.14+-green.svg)](https://cmake.org/)
+![Module Support](https://img.shields.io/badge/Modules-C%2B%2B20-blueviolet.svg)
 
 ## Features
 
 - **Type Definitions**: Standard type aliases for integers, strings, and character types
 - **Enumerations**: Common enums for synchronization modes, states, and priorities
 - **Exception Handling**: Comprehensive exception classes with source location tracking
-- **Source Location**: Utilities for capturing and handling source code location information
+- **Auto Source Location**: Utilities for capturing and handling source code location information
 - **Header-Only**: No compilation required, just include and use
 - **C++20 Module Support**: Optional module interface for modern C++20 projects
 
@@ -26,6 +27,10 @@ NekoSchema serves as a foundational module that defines common types, enumeratio
 - Git
 
 ## Integration
+
+Configuration : [CMake](#cmake-fetchcontent) | [vcpkg](#vcpkg) | [Conan](#conan) | [Manual](#manually) | [Test](#testing)
+
+Example: [Type Definitions](#type-definitions) | [Automatic Source Location](#automatic-source-location) | [Exception Handling](#exception)
 
 ### CMake FetchContent
 
@@ -46,6 +51,29 @@ FetchContent_MakeAvailable(NekoSchema)
 add_executable(your_target main.cpp)
 
 target_link_libraries(your_target PRIVATE Neko::Schema)
+```
+
+#### CMake with Module Support
+
+To enable C++20 module support, use the `NEKO_SCHEMA_ENABLE_MODULE` option:
+
+```cmake
+FetchContent_Declare(
+    ...
+)
+
+# Set Options Before Building
+set(NEKO_SCHEMA_ENABLE_MODULE ON CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(NekoSchema)
+...
+
+target_link_libraries(your_target PRIVATE Neko::Schema::Module)
+```
+
+Import the module in your source code:
+
+```cpp
+import neko.schema;
 ```
 
 ### vcpkg
@@ -70,6 +98,15 @@ Then in your CMakeLists.txt:
 find_package(NekoSchema CONFIG REQUIRED)
 target_link_libraries(your_target PRIVATE Neko::Schema)
 ```
+
+When configuring your project, specify the vcpkg toolchain file:
+
+```shell
+cmake -B build -DCMAKE_PREFIX_PATH=/path/to/vcpkg/installed/x64-windows
+cmake --build build --config Debug
+```
+
+Note: Installing via vcpkg does not support modules.
 
 ### Conan
 
@@ -109,6 +146,48 @@ find_package(NekoSchema CONFIG REQUIRED)
 target_link_libraries(your_target PRIVATE Neko::Schema)
 ```
 
+#### Conan with C++20 Module Support
+
+To enable C++20 module support with Conan, use the `enable_module` option:
+
+```shell
+conan install . --build=missing -o neko-schema/*:enable_module=True
+```
+
+Or specify it in your `conanfile.txt`:
+
+```ini
+[requires]
+neko-schema/*
+
+[options]
+neko-schema/*:enable_module=True
+
+[generators]
+CMakeDeps
+CMakeToolchain
+```
+
+Or in your `conanfile.py`:
+
+```python
+from conan import ConanFile
+
+class YourProject(ConanFile):
+    requires = "neko-schema/*"
+    generators = "CMakeDeps", "CMakeToolchain"
+    
+    def configure(self):
+        self.options["neko-schema"].enable_module = True
+```
+
+Then link against the module target in your CMakeLists.txt:
+
+```cmake
+find_package(NekoSchema CONFIG REQUIRED)
+target_link_libraries(your_target PRIVATE Neko::Schema::Module)
+```
+
 ### Manually
 
 1. Clone or download the repository to your local machine:
@@ -129,55 +208,6 @@ unzip NekoSchema.zip
 
 ```shell
 cp -r NekoSchema/include/ /path/to/your/include/
-```
-
-## C++20 Module Support
-
-NekoSchema supports C++20 modules
-
-### Building with Module Support
-
-To enable C++20 module support, use the `NEKO_SCHEMA_ENABLE_MODULE` option:
-
-```cmake
-include(FetchContent)
-
-FetchContent_Declare(
-    NekoSchema
-    GIT_REPOSITORY https://github.com/moehoshio/NekoSchema.git
-    GIT_TAG        main
-)
-
-# Enable module support
-set(NEKO_SCHEMA_ENABLE_MODULE ON CACHE BOOL "" FORCE)
-
-FetchContent_MakeAvailable(NekoSchema)
-
-# Link against the module target
-add_executable(your_target main.cpp)
-target_link_libraries(your_target PRIVATE Neko::Schema::Module)
-```
-
-### Using the Module
-
-Instead of including headers, simply import the module:
-
-```cpp
-#include <iostream>
-import neko.schema;
-
-int main() {
-    neko::uint32 value = 42;
-    neko::Priority priority = neko::Priority::High;
-    
-    try {
-        throw neko::ex::Exception("Module example");
-    } catch (const neko::ex::Exception& e) {
-        std::cout << e.what() << std::endl;
-    }
-    
-    return 0;
-}
 ```
 
 ## Type Definitions
