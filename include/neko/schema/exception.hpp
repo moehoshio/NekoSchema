@@ -13,7 +13,7 @@
 #endif
 
 /**
- * @brief Exception classes for the NekoLauncher
+ * @brief Exception classes
  * @namespace neko::ex
  */
 namespace neko::ex {

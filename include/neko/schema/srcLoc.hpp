@@ -1,5 +1,7 @@
 #pragma once
 
+#if !defined(NEKO_SCHEMA_ENABLE_MODULE) || (NEKO_SCHEMA_ENABLE_MODULE == false)
+
 /* ===================== */
 /* == Compiler Checks == */
 /* ===================== */
@@ -8,22 +10,17 @@
     #error "Neko SrcLoc Cannot find header <source_location>."
 #endif
 
-#if !defined(NEKO_SCHEMA_ENABLE_MODULE) || (NEKO_SCHEMA_ENABLE_MODULE == false)
-#include <source_location>
 #include <neko/schema/types.hpp>
-#endif
+#include <version>
+#include <source_location>
 
 #if !defined(__cpp_lib_source_location) || __cpp_lib_source_location < 201907L
     #error "Neko SrcLoc requires <source_location> support."
 #endif
 
-
+#endif // !NEKO_SCHEMA_ENABLE_MODULE
 
 namespace neko {
-
-    inline namespace types {
-        using SrcLoc = std::source_location;
-    }
 
     /**
      * @brief Source location information
@@ -34,7 +31,7 @@ namespace neko {
         neko::cstr funcName = nullptr;
 
         constexpr SrcLocInfo(
-            const SrcLoc &loc = SrcLoc::current()) noexcept
+            const std::source_location &loc = std::source_location::current()) noexcept
             : file(loc.file_name()), line(loc.line()), funcName(loc.function_name()) {}
         constexpr SrcLocInfo(neko::cstr file, neko::uint32 line, neko::cstr funcName) noexcept
             : file(file), line(line), funcName(funcName) {}

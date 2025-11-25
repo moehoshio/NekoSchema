@@ -3,10 +3,13 @@
 # Include the targets file
 include("${CMAKE_CURRENT_LIST_DIR}/NekoSchemaTargets.cmake")
 
-# Create the Neko::Schema alias if it doesn't exist
+# Create alias if it doesn't exist
 # (it exists in build tree but not after installation)
 if(TARGET NekoSchema AND NOT TARGET Neko::Schema)
     add_library(Neko::Schema ALIAS NekoSchema)
+endif()
+if(TARGET NekoSchema_module AND NOT TARGET Neko::Schema::Module)
+    add_library(Neko::Schema::Module ALIAS NekoSchema_module)
 endif()
 
 check_required_components(NekoSchema)

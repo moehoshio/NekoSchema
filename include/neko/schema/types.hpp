@@ -9,15 +9,19 @@ namespace neko {
 
     // Basic types should use all-lowercase style
     inline namespace types {
-        // Character and string types
+
+        // =================
+        // == Char/String ==
+        // =================
+
         using cstr = const char *;
         using strview = std::string_view;
         using uchar = unsigned char;
 
-        // Not implemented
-        // using str = neko::string;
+        // ==================
+        // ===== Number =====
+        // ==================
 
-        // Fixed-width integer types
         using uint64 = std::uint64_t;
         using uint32 = std::uint32_t;
         using uint16 = std::uint16_t;
@@ -28,19 +32,17 @@ namespace neko {
         using int16 = std::int16_t;
         using int8 = std::int8_t;
 
-        /**
-         * @brief Synchronization mode for event processing
-         * @details
-         * - Sync: Synchronous mode, blocks until the event is processed
-         * - Async: Asynchronous mode, does not block, event is processed in the background
-         */
+        // =================
+        // ===== Enums =====
+        // =================
+
         enum class SyncMode {
             Sync = 0,
             Async = 1
         };
 
         enum class State {
-            Completed,     // Operation finished successfully, no further action needed
+            Completed,     // Operation finished successfully
             ActionNeeded,  // Action required from user or system
             RetryRequired, // Temporary failure, should retry later
             Failed         // Permanent failure, cannot proceed
@@ -52,6 +54,10 @@ namespace neko {
             High = 2,
             Critical = 3
         };
+
+        // =================
+        // ===== Method ====
+        // =================
 
         inline neko::cstr toString(State state) {
             switch (state) {

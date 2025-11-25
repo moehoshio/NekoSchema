@@ -38,12 +38,11 @@ if(NEKO_SCHEMA_AUTO_FETCH_DEPS)
             GIT_REPOSITORY https://github.com/google/googletest.git
             GIT_TAG        v1.17.0
         )
-        # For Windows: Prevent overriding the parent project's compiler/linker settings
         set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
         FetchContent_MakeAvailable(googletest)
     endif()
 
-endif()
+endif(NEKO_SCHEMA_AUTO_FETCH_DEPS)
 
 
 # ================
@@ -119,11 +118,22 @@ if(NEKO_SCHEMA_BUILD_TESTS)
     
     # Module-based tests (if module is enabled)
     if(NEKO_SCHEMA_ENABLE_MODULE)
-        message(STATUS "NekoSchema module tests enabled")
-        add_executable(NekoSchema_module_tests tests/schema_module_test.cpp)
-        target_link_libraries(NekoSchema_module_tests PRIVATE NekoSchema_module GTest::gtest GTest::gtest_main)
-        target_compile_features(NekoSchema_module_tests PRIVATE cxx_std_20)
-        gtest_discover_tests(NekoSchema_module_tests DISCOVERY_MODE PRE_TEST)
+        if (MSVC)
+            message(STATUS "NekoSchema module tests enabled (MSVC only)")
+
+            add_executable(NekoSchema_module_tests tests/schema_module_test.cpp)
+
+            target_link_libraries(NekoSchema_module_tests PRIVATE
+                NekoSchema
+                NekoSchema_module
+                GTest::gtest
+                GTest::gtest_main
+            )
+            target_compile_features(NekoSchema_module_tests PRIVATE cxx_std_20)
+            gtest_discover_tests(NekoSchema_module_tests DISCOVERY_MODE PRE_TEST)
+        else()
+            message(STATUS "Skipping NekoSchema module tests on non-MSVC toolchains")
+        endif()
     endif()
     
 else()

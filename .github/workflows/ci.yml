@@ -144,7 +144,13 @@ jobs:
       if: startsWith(matrix.config.os, 'ubuntu')
       run: |
         sudo apt-get update
-        sudo apt-get install -y build-essential cmake ninja-build
+        sudo apt-get install -y build-essential ninja-build
+
+        # Install latest CMake (4.x) from Kitware APT repository
+        wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | sudo gpg --dearmor -o /usr/share/keyrings/kitware-archive-keyring.gpg
+        echo "deb [signed-by=/usr/share/keyrings/kitware-archive-keyring.gpg] https://apt.kitware.com/ubuntu/ jammy main" | sudo tee /etc/apt/sources.list.d/kitware.list > /dev/null
+        sudo apt-get update
+        sudo apt-get install -y cmake
         
         # For Clang builds, use the system default clang
         # Ubuntu 24.04 (noble) comes with clang-18 by default
