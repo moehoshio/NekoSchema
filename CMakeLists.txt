@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.14)
-project(NekoSchema VERSION 1.1.2 LANGUAGES CXX)
+project(NekoSchema VERSION 1.1.3 LANGUAGES CXX)
 
 # ================
 # === Config ====
@@ -84,15 +84,6 @@ if(NEKO_SCHEMA_ENABLE_MODULE)
     )
     
     target_compile_features(NekoSchema_module PUBLIC cxx_std_20)
-    
-    # Compiler-specific module flags
-    if(MSVC)
-        target_compile_options(NekoSchema_module PUBLIC /experimental:module)
-    elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-        target_compile_options(NekoSchema_module PUBLIC -fmodules-ts)
-    elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-        target_compile_options(NekoSchema_module PUBLIC -fmodules)
-    endif()
     
     # Module still needs access to the include directory for the headers
     target_include_directories(NekoSchema_module PUBLIC

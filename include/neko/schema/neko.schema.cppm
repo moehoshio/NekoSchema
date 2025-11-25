@@ -1,22 +1,22 @@
-/**
- * @file neko.schema.cppm
- * @brief C++20 module interface for NekoSchema
- * @details This module exports all NekoSchema functionality by wrapping the header files.
- *          The original headers are still available for traditional include-based usage.
- */
+// =====================
+// === Global Module ===
+// =====================
 
 module;
 
-#if defined(__cpp_lib_modules) && (__cpp_lib_modules >= 202207L)
-import std;
-#else
-// Global module fragment - include headers that should not be exported
+// ====================
+// = Standard Library =
+// ====================
+
 #include <cstdint>
-#include <string_view>
-#include <string>
 #include <exception>
 #include <source_location>
-#endif
+#include <string>
+#include <string_view>
+
+// =====================
+// = Module Interface ==
+// =====================
 
 export module neko.schema;
 
