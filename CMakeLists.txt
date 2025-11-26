@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.14)
-project(NekoSchema VERSION 1.1.3 LANGUAGES CXX)
+project(NekoSchema VERSION 1.1.4 LANGUAGES CXX)
 
 # ================
 # === Config ====

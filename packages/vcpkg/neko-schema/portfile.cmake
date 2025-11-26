@@ -1,8 +1,8 @@
 ﻿vcpkg_from_github(
     OUT_SOURCE_PATH SOURCE_PATH
     REPO moehoshio/NekoSchema
-    REF v1.1.2
-    SHA512 44c3ddb583a8a2b269907ccc74e80ef2177b3dec62218d3118be8a6b6c0afabab4f981f638d5cc059181d248fe02f6ee3733fc3e94504dde6860e831ae8f8a08
+    REF v1.1.4
+    SHA512 2b246d62c25cf502a8c15d0d7ef2c23a6a2c3a3de5c1710e9720d9d95efff11ccd6d5e852bd7ff4eba0f3ecffb3d565381687d6af651fff22a845738032048dc
     HEAD_REF main
 )
 
@@ -24,5 +24,3 @@ file(REMOVE_RECURSE "${CURRENT_PACKAGES_DIR}/lib")
 vcpkg_install_copyright(FILE_LIST "${SOURCE_PATH}/LICENSE")
 
 file(INSTALL "${CMAKE_CURRENT_LIST_DIR}/usage" DESTINATION "${CURRENT_PACKAGES_DIR}/share/${PORT}")
-
-
