@@ -180,31 +180,31 @@ TEST_F(ExceptionTest, SystemErrorHierarchy) {
 }
 
 TEST_F(ExceptionTest, SpecializedExceptions) {
-    neko::ex::InvalidArgument invalidArg("Invalid argument");
+    neko::ex::ArgumentError invalidArg("Invalid argument");
     EXPECT_STREQ(invalidArg.what(), "Invalid argument");
     
-    neko::ex::OutOfRange outOfRange("Out of range");
+    neko::ex::RangeError outOfRange("Out of range");
     EXPECT_STREQ(outOfRange.what(), "Out of range");
     
-    neko::ex::NotImplemented notImpl("Not implemented");
-    EXPECT_STREQ(notImpl.what(), "Not implemented");
+    neko::ex::NotSupported notImpl("Not supported");
+    EXPECT_STREQ(notImpl.what(), "Not supported");
     
-    neko::ex::Timeout timeout("Timeout occurred");
+    neko::ex::TimeoutError timeout("Timeout occurred");
     EXPECT_STREQ(timeout.what(), "Timeout occurred");
 }
 
 TEST_F(ExceptionTest, DefaultMessages) {
     // Test default messages for various exception types
-    neko::ex::InvalidArgument invalidArg;
+    neko::ex::ArgumentError invalidArg;
     EXPECT_STREQ(invalidArg.what(), "Invalid argument!");
     
     neko::ex::FileError fileErr;
     EXPECT_STREQ(fileErr.what(), "File error!");
     
-    neko::ex::NotImplemented notImpl;
-    EXPECT_STREQ(notImpl.what(), "Not implemented!");
+    neko::ex::NotSupported notImpl;
+    EXPECT_STREQ(notImpl.what(), "Not supported!");
     
-    neko::ex::Timeout timeout;
+    neko::ex::TimeoutError timeout;
     EXPECT_STREQ(timeout.what(), "Timeout!");
 }
 
@@ -229,7 +229,7 @@ TEST_F(ExceptionTest, ExceptionPolymorphism) {
 
 TEST_F(ExceptionTest, ExceptionInheritanceFromStdException) {
     // Test that our exceptions inherit from std::exception
-    neko::ex::InvalidArgument ex("test");
+    neko::ex::ArgumentError ex("test");
     
     // Should be catchable as std::exception
     try {

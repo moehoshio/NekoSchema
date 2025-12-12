@@ -272,26 +272,24 @@ int main() {
 ```cpp
 #include <neko/schema/exception.hpp>
 
-try {
-
-    throw neko::ex::Runtime("Sample runtime error");
-
-} catch (const neko::ex::OutOfRange& e) {
-
-    std::cout << "OutOfRange error caught at " << loc.getFile() << ":" << loc.getLine() << " in function " << loc.getFunc() << std::endl;
-    std::cout << "Error message: " << e.what() << std::endl;
-
-} catch (const neko::ex::SystemError& e) {
-
-    if (e.hasSrcLocInfo()) {
-        auto loc = e.getSrcLoc();
-        // ...
+int main() {
+    try {
+        // Recommended names (old aliases are deprecated and will warn):
+        throw neko::ex::RuntimeError("Sample runtime error", {});
+    } catch (const neko::ex::RangeError &e) {
+        std::cout << "Range error: " << e.what() << std::endl;
+    } catch (const neko::ex::SystemError &e) {
+        if (e.hasSrcLocInfo()) {
+            auto loc = e.getSrcLoc();
+            std::cout << "System error from " << loc.getFile() << ':' << loc.getLine() << " in " << loc.getFunc() << '\n';
+        }
+    } catch (const neko::ex::Exception &e) {
+        std::cout << "Generic error: " << e.what() << std::endl;
     }
-    
-} catch (const neko::ex::Exception& e) {
-    // ...
 }
 ```
+
+> Note: using legacy names (e.g., `neko::ex::Runtime`, `OutOfRange`, `InvalidArgument`) remains possible but is marked `[[deprecated]]` and will emit a compiler warning. Prefer the new names such as `RuntimeError`, `RangeError`, and `ArgumentError`.
 
 ## Testing
 

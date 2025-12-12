@@ -165,15 +165,15 @@ TEST_F(ModuleExceptionTest, CStringConstructor) {
     EXPECT_STREQ(ex.what(), "C-string error");
 }
 
-TEST_F(ModuleExceptionTest, InvalidOperationException) {
-    neko::ex::InvalidOperation ex("Invalid operation");
+TEST_F(ModuleExceptionTest, InvalidStateException) {
+    neko::ex::InvalidState ex("Invalid operation");
 
     EXPECT_STREQ(ex.what(), "Invalid operation");
     EXPECT_TRUE(ex.hasSrcLocInfo());
 }
 
 TEST_F(ModuleExceptionTest, ArgumentException) {
-    neko::ex::InvalidArgument ex("Bad argument");
+    neko::ex::ArgumentError ex("Bad argument");
 
     EXPECT_STREQ(ex.what(), "Bad argument");
 }

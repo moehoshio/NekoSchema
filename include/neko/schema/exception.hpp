@@ -108,175 +108,184 @@ namespace neko::ex {
             : Exception(Msg, SrcLoc) {}
     };
 
-    /**
-     * @brief Exception for already existing objects.
-     */
-    class AlreadyExists : public Exception {
+    // ---------------------------------------------------------------------
+    // Logic-layer errors
+    // ---------------------------------------------------------------------
+
+    class LogicError : public Exception {
     public:
-        explicit AlreadyExists(const std::string &Msg = "Object already exists!", const neko::SrcLocInfo &SrcLoc = {}) noexcept
+        explicit LogicError(const std::string &Msg = "Logic error!", const neko::SrcLocInfo &SrcLoc = {}) noexcept
             : Exception(Msg, SrcLoc) {}
+        explicit LogicError(neko::cstr Msg, const neko::SrcLocInfo &SrcLoc = {}) noexcept
+            : Exception(Msg ? Msg : "Logic error!", SrcLoc) {}
     };
 
-    /**
-     * @brief Exception for invalid arguments.
-     */
-    class InvalidArgument : public Exception {
+    class ArgumentError : public LogicError {
     public:
-        explicit InvalidArgument(const std::string &Msg = "Invalid argument!", const neko::SrcLocInfo &SrcLoc = {}) noexcept
-            : Exception(Msg, SrcLoc) {}
+        explicit ArgumentError(const std::string &Msg = "Invalid argument!", const neko::SrcLocInfo &SrcLoc = {}) noexcept
+            : LogicError(Msg, SrcLoc) {}
+        explicit ArgumentError(neko::cstr Msg, const neko::SrcLocInfo &SrcLoc = {}) noexcept
+            : LogicError(Msg ? Msg : "Invalid argument!", SrcLoc) {}
     };
 
-    /**
-     * @brief Exception for system errors.
-     */
-    class SystemError : public Exception {
+    class RangeError : public ArgumentError {
+    public:
+        explicit RangeError(const std::string &Msg = "Out of range!", const neko::SrcLocInfo &SrcLoc = {}) noexcept
+            : ArgumentError(Msg, SrcLoc) {}
+        explicit RangeError(neko::cstr Msg, const neko::SrcLocInfo &SrcLoc = {}) noexcept
+            : ArgumentError(Msg ? Msg : "Out of range!", SrcLoc) {}
+    };
+
+    class NotSupported : public LogicError {
+    public:
+        explicit NotSupported(const std::string &Msg = "Not supported!", const neko::SrcLocInfo &SrcLoc = {}) noexcept
+            : LogicError(Msg, SrcLoc) {}
+        explicit NotSupported(neko::cstr Msg, const neko::SrcLocInfo &SrcLoc = {}) noexcept
+            : LogicError(Msg ? Msg : "Not supported!", SrcLoc) {}
+    };
+
+    class InvalidState : public LogicError {
+    public:
+        explicit InvalidState(const std::string &Msg = "Invalid state!", const neko::SrcLocInfo &SrcLoc = {}) noexcept
+            : LogicError(Msg, SrcLoc) {}
+        explicit InvalidState(neko::cstr Msg, const neko::SrcLocInfo &SrcLoc = {}) noexcept
+            : LogicError(Msg ? Msg : "Invalid state!", SrcLoc) {}
+    };
+
+    class AssertionFailure : public LogicError {
+    public:
+        explicit AssertionFailure(const std::string &Msg = "Assertion failed!", const neko::SrcLocInfo &SrcLoc = {}) noexcept
+            : LogicError(Msg, SrcLoc) {}
+        explicit AssertionFailure(neko::cstr Msg, const neko::SrcLocInfo &SrcLoc = {}) noexcept
+            : LogicError(Msg ? Msg : "Assertion failed!", SrcLoc) {}
+    };
+
+    class DuplicateError : public LogicError {
+    public:
+        explicit DuplicateError(const std::string &Msg = "Object already exists!", const neko::SrcLocInfo &SrcLoc = {}) noexcept
+            : LogicError(Msg, SrcLoc) {}
+        explicit DuplicateError(neko::cstr Msg, const neko::SrcLocInfo &SrcLoc = {}) noexcept
+            : LogicError(Msg ? Msg : "Object already exists!", SrcLoc) {}
+    };
+
+    // ---------------------------------------------------------------------
+    // Runtime-layer errors
+    // ---------------------------------------------------------------------
+
+    class RuntimeError : public Exception {
+    public:
+        explicit RuntimeError(const std::string &Msg = "Runtime error!", const neko::SrcLocInfo &SrcLoc = {}) noexcept
+            : Exception(Msg, SrcLoc) {}
+        explicit RuntimeError(neko::cstr Msg, const neko::SrcLocInfo &SrcLoc = {}) noexcept
+            : Exception(Msg ? Msg : "Runtime error!", SrcLoc) {}
+    };
+
+    class ConfigurationError : public RuntimeError {
+    public:
+        explicit ConfigurationError(const std::string &Msg = "Configuration error!", const neko::SrcLocInfo &SrcLoc = {}) noexcept
+            : RuntimeError(Msg, SrcLoc) {}
+        explicit ConfigurationError(neko::cstr Msg, const neko::SrcLocInfo &SrcLoc = {}) noexcept
+            : RuntimeError(Msg ? Msg : "Configuration error!", SrcLoc) {}
+    };
+
+    class ParseError : public RuntimeError {
+    public:
+        explicit ParseError(const std::string &Msg = "Parse error!", const neko::SrcLocInfo &SrcLoc = {}) noexcept
+            : RuntimeError(Msg, SrcLoc) {}
+        explicit ParseError(neko::cstr Msg, const neko::SrcLocInfo &SrcLoc = {}) noexcept
+            : RuntimeError(Msg ? Msg : "Parse error!", SrcLoc) {}
+    };
+
+    class ConcurrencyError : public RuntimeError {
+    public:
+        explicit ConcurrencyError(const std::string &Msg = "Concurrency error!", const neko::SrcLocInfo &SrcLoc = {}) noexcept
+            : RuntimeError(Msg, SrcLoc) {}
+        explicit ConcurrencyError(neko::cstr Msg, const neko::SrcLocInfo &SrcLoc = {}) noexcept
+            : RuntimeError(Msg ? Msg : "Concurrency error!", SrcLoc) {}
+    };
+
+    class TaskRejectedError : public ConcurrencyError {
+    public:
+        explicit TaskRejectedError(const std::string &Msg = "Task rejected!", const neko::SrcLocInfo &SrcLoc = {}) noexcept
+            : ConcurrencyError(Msg, SrcLoc) {}
+        explicit TaskRejectedError(neko::cstr Msg, const neko::SrcLocInfo &SrcLoc = {}) noexcept
+            : ConcurrencyError(Msg ? Msg : "Task rejected!", SrcLoc) {}
+    };
+
+    class PermissionDeniedError : public RuntimeError {
+    public:
+        explicit PermissionDeniedError(const std::string &Msg = "Permission denied!", const neko::SrcLocInfo &SrcLoc = {}) noexcept
+            : RuntimeError(Msg, SrcLoc) {}
+        explicit PermissionDeniedError(neko::cstr Msg, const neko::SrcLocInfo &SrcLoc = {}) noexcept
+            : RuntimeError(Msg ? Msg : "Permission denied!", SrcLoc) {}
+    };
+
+    class TimeoutError : public RuntimeError {
+    public:
+        explicit TimeoutError(const std::string &Msg = "Timeout!", const neko::SrcLocInfo &SrcLoc = {}) noexcept
+            : RuntimeError(Msg, SrcLoc) {}
+        explicit TimeoutError(neko::cstr Msg, const neko::SrcLocInfo &SrcLoc = {}) noexcept
+            : RuntimeError(Msg ? Msg : "Timeout!", SrcLoc) {}
+    };
+
+    class SystemError : public RuntimeError {
     public:
         explicit SystemError(const std::string &Msg = "System error!", const neko::SrcLocInfo &SrcLoc = {}) noexcept
-            : Exception(Msg, SrcLoc) {}
+            : RuntimeError(Msg, SrcLoc) {}
+        explicit SystemError(neko::cstr Msg, const neko::SrcLocInfo &SrcLoc = {}) noexcept
+            : RuntimeError(Msg ? Msg : "System error!", SrcLoc) {}
     };
 
-    /**
-     * @brief Exception for file-related errors.
-     */
     class FileError : public SystemError {
     public:
         explicit FileError(const std::string &Msg = "File error!", const neko::SrcLocInfo &SrcLoc = {}) noexcept
             : SystemError(Msg, SrcLoc) {}
+        explicit FileError(neko::cstr Msg, const neko::SrcLocInfo &SrcLoc = {}) noexcept
+            : SystemError(Msg ? Msg : "File error!", SrcLoc) {}
     };
 
-    /**
-     * @brief Exception for network-related errors.
-     */
     class NetworkError : public SystemError {
     public:
         explicit NetworkError(const std::string &Msg = "Network error!", const neko::SrcLocInfo &SrcLoc = {}) noexcept
             : SystemError(Msg, SrcLoc) {}
+        explicit NetworkError(neko::cstr Msg, const neko::SrcLocInfo &SrcLoc = {}) noexcept
+            : SystemError(Msg ? Msg : "Network error!", SrcLoc) {}
     };
 
-    /**
-     * @brief Exception for database-related errors.
-     */
     class DatabaseError : public SystemError {
     public:
         explicit DatabaseError(const std::string &Msg = "Database error!", const neko::SrcLocInfo &SrcLoc = {}) noexcept
             : SystemError(Msg, SrcLoc) {}
+        explicit DatabaseError(neko::cstr Msg, const neko::SrcLocInfo &SrcLoc = {}) noexcept
+            : SystemError(Msg ? Msg : "Database error!", SrcLoc) {}
     };
 
-    /**
-     * @brief Exception for external library errors.
-     */
-    class ExternalLibraryError : public SystemError {
+    class ExternalDependencyError : public SystemError {
     public:
-        explicit ExternalLibraryError(const std::string &Msg = "External library error!", const neko::SrcLocInfo &SrcLoc = {}) noexcept
+        explicit ExternalDependencyError(const std::string &Msg = "External dependency error!", const neko::SrcLocInfo &SrcLoc = {}) noexcept
             : SystemError(Msg, SrcLoc) {}
+        explicit ExternalDependencyError(neko::cstr Msg, const neko::SrcLocInfo &SrcLoc = {}) noexcept
+            : SystemError(Msg ? Msg : "External dependency error!", SrcLoc) {}
     };
 
-    /**
-     * @brief Exception for out-of-range errors.
-     */
-    class OutOfRange : public Exception {
-    public:
-        explicit OutOfRange(const std::string &Msg = "Out of range!", const neko::SrcLocInfo &SrcLoc = {}) noexcept
-            : Exception(Msg, SrcLoc) {}
-    };
+    // ---------------------------------------------------------------------
+    // Compatibility aliases (previous names kept for callers)
+    // ---------------------------------------------------------------------
 
-    /**
-     * @brief Exception for unimplemented features.
-     */
-    class NotImplemented : public Exception {
-    public:
-        explicit NotImplemented(const std::string &Msg = "Not implemented!", const neko::SrcLocInfo &SrcLoc = {}) noexcept
-            : Exception(Msg, SrcLoc) {}
-    };
-
-    /**
-     * @brief Exception for configuration errors.
-     */
-    class Config : public Exception {
-    public:
-        explicit Config(const std::string &Msg = "Configuration error!", const neko::SrcLocInfo &SrcLoc = {}) noexcept
-            : Exception(Msg, SrcLoc) {}
-    };
-
-    /**
-     * @brief Exception for parsing errors.
-     */
-    class Parse : public Exception {
-    public:
-        explicit Parse(const std::string &Msg = "Parse error!", const neko::SrcLocInfo &SrcLoc = {}) noexcept
-            : Exception(Msg, SrcLoc) {}
-    };
-
-    /**
-     * @brief Exception for concurrency errors.
-     */
-    class Concurrency : public Exception {
-    public:
-        explicit Concurrency(const std::string &Msg = "Concurrency error!", const neko::SrcLocInfo &SrcLoc = {}) noexcept
-            : Exception(Msg, SrcLoc) {}
-    };
-
-    /**
-     * @brief Exception for task rejection.
-     */
-    class TaskRejected : public Exception {
-    public:
-        explicit TaskRejected(const std::string &Msg = "Task rejected!", const neko::SrcLocInfo &SrcLoc = {}) noexcept
-            : Exception(Msg, SrcLoc) {}
-    };
-
-    /**
-     * @brief Exception for assertion failures.
-     */
-    class Assertion : public Exception {
-    public:
-        explicit Assertion(const std::string &Msg = "Assertion failed!", const neko::SrcLocInfo &SrcLoc = {}) noexcept
-            : Exception(Msg, SrcLoc) {}
-    };
-
-    /**
-     * @brief Exception for invalid operations.
-     */
-    class InvalidOperation : public Exception {
-    public:
-        explicit InvalidOperation(const std::string &Msg = "Invalid operation!", const neko::SrcLocInfo &SrcLoc = {}) noexcept
-            : Exception(Msg, SrcLoc) {}
-    };
-
-    /**
-     * @brief Exception for permission denied errors.
-     */
-    class PermissionDenied : public Exception {
-    public:
-        explicit PermissionDenied(const std::string &Msg = "Permission denied!", const neko::SrcLocInfo &SrcLoc = {}) noexcept
-            : Exception(Msg, SrcLoc) {}
-    };
-
-    /**
-     * @brief Exception for timeout errors.
-     */
-    class Timeout : public Exception {
-    public:
-        explicit Timeout(const std::string &Msg = "Timeout!", const neko::SrcLocInfo &SrcLoc = {}) noexcept
-            : Exception(Msg, SrcLoc) {}
-    };
-
-    /**
-     * @brief Exception for logic errors.
-     */
-    class Logic : public Exception {
-    public:
-        explicit Logic(const std::string &Msg = "Logic error!", const neko::SrcLocInfo &SrcLoc = {}) noexcept
-            : Exception(Msg, SrcLoc) {}
-    };
-
-    /**
-     * @brief Exception for runtime errors.
-     */
-    class Runtime : public Exception {
-    public:
-        explicit Runtime(const std::string &Msg = "Runtime error!", const neko::SrcLocInfo &SrcLoc = {}) noexcept
-            : Exception(Msg, SrcLoc) {}
-    };
+    using AlreadyExists [[deprecated("Use DuplicateError")]] = DuplicateError;
+    using InvalidArgument [[deprecated("Use ArgumentError")]] = ArgumentError;
+    using OutOfRange [[deprecated("Use RangeError")]] = RangeError;
+    using NotImplemented [[deprecated("Use NotSupported")]] = NotSupported;
+    using InvalidOperation [[deprecated("Use InvalidState")]] = InvalidState;
+    using Assertion [[deprecated("Use AssertionFailure")]] = AssertionFailure;
+    using Config [[deprecated("Use ConfigurationError")]] = ConfigurationError;
+    using Parse [[deprecated("Use ParseError")]] = ParseError;
+    using Concurrency [[deprecated("Use ConcurrencyError")]] = ConcurrencyError;
+    using TaskRejected [[deprecated("Use TaskRejectedError")]] = TaskRejectedError;
+    using PermissionDenied [[deprecated("Use PermissionDeniedError")]] = PermissionDeniedError;
+    using Timeout [[deprecated("Use TimeoutError")]] = TimeoutError;
+    using Logic [[deprecated("Use LogicError")]] = LogicError;
+    using Runtime [[deprecated("Use RuntimeError")]] = RuntimeError;
+    using ExternalLibraryError [[deprecated("Use ExternalDependencyError")]] = ExternalDependencyError;
 
 } // namespace neko::ex

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.14)
-project(NekoSchema VERSION 1.1.4 LANGUAGES CXX)
+project(NekoSchema VERSION 1.1.5 LANGUAGES CXX)
 
 # ================
 # === Config ====
@@ -16,6 +16,7 @@ find_package(GTest QUIET)
 message(STATUS "Start configuration Neko Schema...")
 message(STATUS "")
 message(STATUS "Neko Schema configuration summary:")
+message(STATUS "  - Project version: ${PROJECT_VERSION}")
 message(STATUS "  - CMake version: ${CMAKE_VERSION}")
 message(STATUS "")
 message(STATUS "  - Neko Schema Auto fetch deps: ${NEKO_SCHEMA_AUTO_FETCH_DEPS}")
